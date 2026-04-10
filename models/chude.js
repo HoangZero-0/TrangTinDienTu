@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 
 var chuDeSchema = new mongoose.Schema({
-	TenChuDe: { type: String, unique: true, require: true }
+	TenChuDe: { type: String, unique: true, required: true }
 });
 
 var chuDeModel = mongoose.model('ChuDe', chuDeSchema);

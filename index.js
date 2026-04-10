@@ -1,3 +1,4 @@
+require('dotenv').config();
 var express = require('express');
 var app = express();
 var mongoose = require('mongoose');
@@ -9,8 +10,9 @@ var authRouter = require('./routers/auth');
 var chudeRouter = require('./routers/chude');
 var taikhoanRouter = require('./routers/taikhoan');
 var baivietRouter = require('./routers/baiviet');
+var binhluanRouter = require('./routers/binhluan');
 
-var uri = "mongodb://admin:admin123@ac-ey8c2sr-shard-00-01.em5yvyc.mongodb.net:27017/trangtin?ssl=true&authSource=admin";
+var uri = process.env.MONGO_URI || "mongodb://admin:admin123@ac-ey8c2sr-shard-00-01.em5yvyc.mongodb.net:27017/trangtin?ssl=true&authSource=admin";
 mongoose.connect(uri)
     .then(() => console.log('Đã kết nối thành công tới MongoDB.'))
     .catch(err => console.log(err));
@@ -21,11 +23,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/', express.static(path.join(__dirname, 'public')));
 
+var MongoStore = require('connect-mongo').MongoStore;
 app.use(session({
 	name: 'iNews',						// Tên session (tự chọn)
 	secret: 'Mèo méo meo mèo meo',		// Khóa bảo vệ (tự chọn)
 	resave: false,
 	saveUninitialized: false,
+	store: MongoStore.create({ mongoUrl: uri }),
 	cookie: {
 		maxAge: 30 * 24 * 60 * 60 * 1000// Hết hạn sau 30 ngày
 	}
@@ -56,6 +60,14 @@ app.use('/', authRouter);
 app.use('/chude', chudeRouter);
 app.use('/taikhoan', taikhoanRouter);
 app.use('/baiviet', baivietRouter);
+app.use('/binhluan', binhluanRouter);
+
+// Global Error Handler - Bắt tất cả lỗi từ async routes (Express 5)
+app.use((err, req, res, next) => {
+	console.error('[LỖI HỆ THỐNG]', err.message);
+	req.session.error = 'Đã xảy ra lỗi hệ thống, vui lòng thử lại.';
+	res.redirect('/error');
+});
 
 app.listen(3000, () => {
 	console.log('Server is running at http://127.0.0.1:3000');

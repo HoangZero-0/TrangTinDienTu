@@ -2,6 +2,10 @@ var express = require('express');
 var router = express.Router();
 var bcrypt = require('bcryptjs');
 var TaiKhoan = require('../models/taikhoan');
+var ChuDe = require('../models/chude');
+var BaiViet = require('../models/baiviet');
+var { isAdmin } = require('../modules/middlewares');
+var upload = require('../modules/upload');
 
 // GET: Đăng ký
 router.get('/dangky', async (req, res) => {
@@ -11,18 +15,34 @@ router.get('/dangky', async (req, res) => {
 });
 
 // POST: Đăng ký
-router.post('/dangky', async (req, res) => {
+router.post('/dangky', upload.single('HinhAnh'), async (req, res) => {
+	// Kiểm tra xác nhận mật khẩu
+	if (req.body.MatKhau !== req.body.XacNhanMatKhau) {
+		req.session.error = 'Mật khẩu xác nhận không khớp, vui lòng thử lại.';
+		return res.redirect('/error');
+	}
+	
 	var salt = bcrypt.genSaltSync(10);
 	var data = {
 		HoVaTen: req.body.HoVaTen,
 		Email: req.body.Email,
-		HinhAnh: req.body.HinhAnh,
 		TenDangNhap: req.body.TenDangNhap,
 		MatKhau: bcrypt.hashSync(req.body.MatKhau, salt)
 	};
-	await TaiKhoan.create(data);
-	req.session.success = 'Đã đăng ký tài khoản thành công.';
-	res.redirect('/success');
+	if(req.file) data.HinhAnh = '/images/uploads/' + req.file.filename;
+	
+	try {
+		await TaiKhoan.create(data);
+		req.session.success = 'Đã đăng ký tài khoản thành công.';
+		res.redirect('/success');
+	} catch (err) {
+		if (err.code === 11000) {
+			req.session.error = 'Tên đăng nhập đã tồn tại, vui lòng chọn tên khác.';
+		} else {
+			req.session.error = 'Lỗi không xác định: ' + err.message;
+		}
+		res.redirect('/error');
+	}
 });
 
 // GET: Đăng nhập
@@ -78,10 +98,16 @@ router.get('/dangxuat', async (req, res) => {
 	}
 });
 
-// GET: Đăng ký
-router.get('/admin', async (req, res) => {
+// GET: Trang quản trị
+router.get('/admin', isAdmin, async (req, res) => {
+	var countChuDe = await ChuDe.countDocuments();
+	var countBaiViet = await BaiViet.countDocuments();
+	var countTaiKhoan = await TaiKhoan.countDocuments();
 	res.render('admin', {
-		title: 'Trang quản trị'
+		title: 'Trang quản trị',
+		countChuDe: countChuDe,
+		countBaiViet: countBaiViet,
+		countTaiKhoan: countTaiKhoan
 	});
 });
 

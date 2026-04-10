@@ -18,7 +18,32 @@
 		<div class="card mt-3">
 			<div class="card-header"><%= title %></div>
 			<div class="card-body">
-				<p class="card-text">Trang chủ quản trị đang cập nhật.</p>
+				<div class="row text-center">
+					<div class="col-md-4">
+						<div class="card text-bg-primary mb-3">
+							<div class="card-body">
+								<h1 class="card-title"><%= typeof countChuDe !== 'undefined' ? countChuDe : 0 %></h1>
+								<p class="card-text">Tổng Chủ Đề</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="card text-bg-success mb-3">
+							<div class="card-body">
+								<h1 class="card-title"><%= typeof countBaiViet !== 'undefined' ? countBaiViet : 0 %></h1>
+								<p class="card-text">Tổng Bài Viết</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="card text-bg-warning mb-3">
+							<div class="card-body">
+								<h1 class="card-title"><%= typeof countTaiKhoan !== 'undefined' ? countTaiKhoan : 0 %></h1>
+								<p class="card-text">Tổng Tài Khoản</p>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 		

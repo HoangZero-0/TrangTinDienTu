@@ -18,7 +18,7 @@
 		<div class="card mt-3">
 			<div class="card-header"><%= title %></div>
 			<div class="card-body">
-				<form action="/taikhoan/sua/<%= taikhoan._id %>" method="post" class="needs-validation" novalidate>
+				<form action="/taikhoan/sua/<%= taikhoan._id %>" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
 					<div class="mb-3">
 						<label for="HoVaTen" class="form-label">Họ và tên</label>
 						<input type="text" class="form-control" id="HoVaTen" name="HoVaTen" value="<%= taikhoan.HoVaTen %>" required />
@@ -31,7 +31,10 @@
 					
 					<div class="mb-3">
 						<label class="form-label" for="HinhAnh">Hình ảnh</label>
-						<input type="text" class="form-control" id="HinhAnh" name="HinhAnh" value="<%= taikhoan.HinhAnh %>" placeholder="Tập tin ảnh đại diện" />
+						<% if(taikhoan.HinhAnh) { %>
+							<img src="<%= taikhoan.HinhAnh %>" width="100" class="mb-2 d-block" />
+						<% } %>
+						<input type="file" class="form-control" id="HinhAnh" name="HinhAnh" />
 					</div>
 					
 					<div class="mb-3">

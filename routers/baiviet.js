@@ -2,9 +2,10 @@ var express = require('express');
 var router = express.Router();
 var ChuDe = require('../models/chude');
 var BaiViet = require('../models/baiviet');
+var { isAuth, isAdmin } = require('../modules/middlewares');
 
 // GET: Danh sách bài viết
-router.get('/', async (req, res) => {
+router.get('/', isAdmin, async (req, res) => {
 	var bv = await BaiViet.find()
 		.populate('ChuDe')
 		.populate('TaiKhoan').exec();
@@ -15,7 +16,7 @@ router.get('/', async (req, res) => {
 });
 
 // GET: Đăng bài viết
-router.get('/them', async (req, res) => {
+router.get('/them', isAuth, async (req, res) => {
 	// Lấy chủ đề hiển thị vào form thêm
 	var cd = await ChuDe.find();
 	res.render('baiviet_them', {
@@ -25,8 +26,8 @@ router.get('/them', async (req, res) => {
 });
 
 // POST: Đăng bài viết
-router.post('/them', async (req, res) => {
-	if(req.session.MaNguoiDung) {
+router.post('/them', isAuth, async (req, res) => {
+	if (req.session.MaNguoiDung) {
 		var data = {
 			ChuDe: req.body.MaChuDe,
 			TaiKhoan: req.session.MaNguoiDung,
@@ -43,10 +44,18 @@ router.post('/them', async (req, res) => {
 });
 
 // GET: Sửa bài viết
-router.get('/sua/:id', async (req, res) => {
+router.get('/sua/:id', isAuth, async (req, res) => {
 	var id = req.params.id;
-	var cd = await ChuDe.find();
 	var bv = await BaiViet.findById(id);
+	if (!bv) return res.redirect('/baiviet/cuatoi');
+	
+	// Khóa an toàn Sở hữu (IDOR)
+	if (req.session.QuyenHan !== 'admin' && bv.TaiKhoan.toString() !== req.session.MaNguoiDung) {
+		req.session.error = 'Lỗi Đặc Quyền: Bạn không có quyền sửa bài viết của người khác!';
+		return res.redirect('/error');
+	}
+
+	var cd = await ChuDe.find();
 	res.render('baiviet_sua', {
 		title: 'Sửa bài viết',
 		chude: cd,
@@ -55,8 +64,17 @@ router.get('/sua/:id', async (req, res) => {
 });
 
 // POST: Sửa bài viết
-router.post('/sua/:id', async (req, res) => {
+router.post('/sua/:id', isAuth, async (req, res) => {
 	var id = req.params.id;
+	var bv = await BaiViet.findById(id);
+	if (!bv) return res.redirect('/baiviet/cuatoi');
+	
+	// Khóa an toàn Sở hữu (IDOR)
+	if (req.session.QuyenHan !== 'admin' && bv.TaiKhoan.toString() !== req.session.MaNguoiDung) {
+		req.session.error = 'Lỗi Đặc Quyền: Bạn không có quyền sửa bài viết của người khác!';
+		return res.redirect('/error');
+	}
+
 	var data = {
 		ChuDe: req.body.MaChuDe,
 		TieuDe: req.body.TieuDe,
@@ -68,28 +86,39 @@ router.post('/sua/:id', async (req, res) => {
 	res.redirect('/success');
 });
 
-// GET: Xóa bài viết
-router.get('/xoa/:id', async (req, res) => {
+// POST: Xóa bài viết
+router.post('/xoa/:id', isAuth, async (req, res) => {
 	var id = req.params.id;
+	var bv = await BaiViet.findById(id);
+	if (!bv) return res.redirect(req.get('Referrer') || '/');
+
+	// Khóa an toàn Sở hữu (IDOR)
+	if (req.session.QuyenHan !== 'admin' && bv.TaiKhoan.toString() !== req.session.MaNguoiDung) {
+		req.session.error = 'Lỗi Đặc Quyền: Bạn không có quyền xóa bài viết của người khác!';
+		return res.redirect('/error');
+	}
+
 	await BaiViet.findByIdAndDelete(id);
 	
 	// Trở lại trang trước
 	res.redirect(req.get('Referrer') || '/');
 });
 
-// GET: Duyệt bài viết
-router.get('/duyet/:id', async (req, res) => {
+// POST: Duyệt bài viết
+router.post('/duyet/:id', isAdmin, async (req, res) => {
 	var id = req.params.id;
 	var bv = await BaiViet.findById(id);
-	await BaiViet.findByIdAndUpdate(id, { 'KiemDuyet': 1 - bv.KiemDuyet });
+	if (bv) {
+		await BaiViet.findByIdAndUpdate(id, { 'KiemDuyet': 1 - bv.KiemDuyet });
+	}
 	
 	// Trở lại trang trước
 	res.redirect(req.get('Referrer') || '/');
 });
 
 // GET: Danh sách bài viết của tôi
-router.get('/cuatoi', async (req, res) => {
-	if(req.session.MaNguoiDung) {
+router.get('/cuatoi', isAuth, async (req, res) => {
+	if (req.session.MaNguoiDung) {
 		// Mã người dùng hiện tại
 		var id = req.session.MaNguoiDung;
 		var bv = await BaiViet.find({ TaiKhoan: id })

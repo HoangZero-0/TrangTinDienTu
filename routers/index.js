@@ -1,20 +1,30 @@
 var express = require('express');
 var router = express.Router();
 var firstImage = require('../modules/firstimage');
+var upload = require('../modules/upload');
 var ChuDe = require('../models/chude');
 var BaiViet = require('../models/baiviet');
+var BinhLuan = require('../models/binhluan');
+var { isAuth } = require('../modules/middlewares');
 
 // GET: Trang chủ
 router.get('/', async (req, res) => {
+	var perPage = 12;
+	var page = req.query.page || 1;
+	
 	// Lấy chuyên mục hiển thị vào menu
 	var cm = await ChuDe.find();
 	
-	// Lấy 12 bài viết mới nhất
+	// Lấy 12 bài viết phân trang
 	var bv = await BaiViet.find({ KiemDuyet: 1 })
 		.sort({ NgayDang: -1 })
 		.populate('ChuDe')
 		.populate('TaiKhoan')
-		.limit(12).exec();
+		.skip((perPage * page) - perPage)
+		.limit(perPage).exec();
+		
+	var count = await BaiViet.countDocuments({ KiemDuyet: 1 });
+	var pages = Math.ceil(count / perPage);
 	
 	// Lấy 3 bài viết xem nhiều nhất hiển thị vào cột phải
 	var xnn = await BaiViet.find({ KiemDuyet: 1 })
@@ -28,6 +38,8 @@ router.get('/', async (req, res) => {
 		chuyenmuc: cm,
 		baiviet: bv,
 		xemnhieunhat: xnn,
+		current: page,
+		pages: pages,
 		firstImage: firstImage
 	});
 });
@@ -78,8 +90,31 @@ router.get('/baiviet/chitiet/:id', async (req, res) => {
 		.populate('ChuDe')
 		.populate('TaiKhoan').exec();
 
+	if (!bv) {
+		req.session.error = 'Bài viết không tồn tại.';
+		return res.redirect('/error');
+	}
+
+	// Chặn xem bài chưa duyệt nếu không phải Admin hoặc Tác giả
+	if (bv.KiemDuyet === 0) {
+		if (req.session.QuyenHan !== 'admin' && (!req.session.MaNguoiDung || bv.TaiKhoan._id.toString() !== req.session.MaNguoiDung)) {
+			// Bài viết chưa duyệt, ẩn đi với độc giả thường
+			req.session.error = 'Bài viết này đang chờ Ban biên tập kiểm duyệt.';
+			return res.redirect('/error');
+		}
+	}
+
+	// Lấy bình luận của bài viết
+	var bl = await BinhLuan.find({ BaiViet: id, KiemDuyet: 1 })
+		.sort({ NgayBinhLuan: -1 })
+		.populate('TaiKhoan').exec();
+
 	// Xử lý tăng lượt xem bài viết
-	await BaiViet.findByIdAndUpdate(id, { $inc: { LuotXem: 1 } });
+	if(!req.session.DaXem) req.session.DaXem = [];
+	if(!req.session.DaXem.includes(id)) {
+		await BaiViet.findByIdAndUpdate(id, { $inc: { LuotXem: 1 } });
+		req.session.DaXem.push(id);
+	}
 
 	// Lấy 3 bài viết xem nhiều nhất hiển thị vào cột phải
 	var xnn = await BaiViet.find({ KiemDuyet: 1 })
@@ -91,29 +126,85 @@ router.get('/baiviet/chitiet/:id', async (req, res) => {
 	res.render('baiviet_chitiet', {
 		chuyenmuc: cm,
 		baiviet: bv,
+		binhluan: bl,
 		xemnhieunhat: xnn,
 		firstImage: firstImage
 	});
 });
 
-// GET: Tin mới nhất
-router.get('/tinmoi', async (req, res) => {
-	res.render('tinmoinhat', {
-		title: 'Tin mới nhất'
+// POST: Gửi bình luận
+router.post('/binhluan/:id', isAuth, async (req, res) => {
+	var id = req.params.id;
+	var data = {
+		BaiViet: id,
+		TaiKhoan: req.session.MaNguoiDung,
+		NoiDung: req.body.NoiDung
+	};
+	await BinhLuan.create(data);
+	res.redirect('/baiviet/chitiet/' + id);
+});
+
+// GET: Liên hệ
+router.get('/lienhe', async (req, res) => {
+	var cm = await ChuDe.find();
+	res.render('lienhe', {
+		title: 'Liên hệ',
+		chuyenmuc: cm
 	});
 });
 
-// POST: Kết quả tìm kiếm
-router.post('/timkiem', async (req, res) => {
-	var tukhoa = req.body.tukhoa;
+// GET: Chính sách riêng tư
+router.get('/chinhsach', async (req, res) => {
+	var cm = await ChuDe.find();
+	res.render('chinhsach', {
+		title: 'Chính sách riêng tư',
+		chuyenmuc: cm
+	});
+});
+
+// GET: Tin mới nhất
+router.get('/tinmoi', async (req, res) => {
+	var bv = await BaiViet.find({ KiemDuyet: 1 })
+		.sort({ NgayDang: -1 })
+		.populate('ChuDe')
+		.populate('TaiKhoan')
+		.limit(50).exec();
+		
+	res.render('tinmoinhat', {
+		title: 'Tin mới nhất',
+		baiviet: bv,
+		firstImage: firstImage
+	});
+});
+
+// GET: Kết quả tìm kiếm
+router.get('/timkiem', async (req, res) => {
+	var tukhoa = req.query.tukhoa;
+	
+	// Escape ký tự đặc biệt regex để chống ReDoS
+	var escapedTukhoa = tukhoa.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 	
 	// Xử lý tìm kiếm bài viết
-	var bv = [];
+	var bv = await BaiViet.find({ KiemDuyet: 1, TieuDe: new RegExp(escapedTukhoa, 'i') })
+		.populate('ChuDe')
+		.populate('TaiKhoan')
+		.exec();
 	
+	// Render view timkiem.ejs
 	res.render('timkiem', {
 		title: 'Kết quả tìm kiếm',
 		baiviet: bv,
-		tukhoa: tukhoa
+		tukhoa: tukhoa,
+		firstImage: firstImage
+	});
+});
+
+// POST: Upload hình ảnh từ CKEditor
+router.post('/upload', isAuth, upload.single('upload'), async (req, res) => {
+	res.status(200).json({
+		uploaded: 1,
+		fileName: req.file.filename,
+		url: '/images/uploads/' + req.file.filename
 	});
 });
 

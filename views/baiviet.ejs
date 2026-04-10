@@ -38,23 +38,23 @@
 							<tr>
 								<td class="align-middle"><%= stt++ %></td>
 								<td class="align-middle small"><%= bv.TaiKhoan.HoVaTen %></td>
-								<td class="align-middle small"><%= bv.ChuDe.TenChuDe %></td>
+								<td class="align-middle small"><%= bv.ChuDe ? bv.ChuDe.TenChuDe : 'Chưa phân loại' %></td>
 								<td class="align-middle small"><%= bv.TieuDe %></td>
 								<td class="align-middle small"><%= new Date(bv.NgayDang.toISOString()).toLocaleString("vi-VN") %></td>
 								<td class="align-middle text-center">
 									<% if(bv.KiemDuyet == 1) { %>
-										<a href="/baiviet/duyet/<%= bv._id %>"><i class="bi bi-check-circle"></i></a>
+										<form action="/baiviet/duyet/<%= bv._id %>" method="POST" style="display:inline;"><button type="submit" class="btn btn-sm btn-link p-0" title="Bỏ duyệt"><i class="bi bi-check-circle"></i></button></form>
 									<% } else { %>
-										<a href="/baiviet/duyet/<%= bv._id %>"><i class="bi bi-x-circle text-danger"></i></a>
+										<form action="/baiviet/duyet/<%= bv._id %>" method="POST" style="display:inline;"><button type="submit" class="btn btn-sm btn-link p-0" title="Duyệt bài"><i class="bi bi-x-circle text-danger"></i></button></form>
 									<% } %>
 								</td>
 								<td class="align-middle text-center">
 									<a href="/baiviet/sua/<%= bv._id %>"><i class="bi bi-pencil-square"></i></a>
 								</td>
 								<td class="align-middle text-center">
-									<a href="/baiviet/xoa/<%= bv._id %>" onclick="return confirm('Bạn có muốn xóa bài viết <%= bv.TieuDe %> không?');">
-										<i class="bi bi-trash text-danger"></i>
-									</a>
+									<form action="/baiviet/xoa/<%= bv._id %>" method="POST" style="display:inline;" onsubmit="return confirm('Bạn có muốn xóa bài viết <%= bv.TieuDe %> không?');">
+										<button type="submit" class="btn btn-sm btn-link p-0"><i class="bi bi-trash text-danger"></i></button>
+									</form>
 								</td>
 							</tr>
 						<% }); %>

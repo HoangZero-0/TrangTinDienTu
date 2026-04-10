@@ -24,7 +24,7 @@
 						<select class="form-select" id="MaChuDe" name="MaChuDe" required>
 							<option value="">-- Chọn --</option>
 							<% chude.forEach(cd => { %>
-								<% if(cd._id == baiviet.ChuDe.valueOf()) { %>
+								<% if(baiviet.ChuDe && cd._id == baiviet.ChuDe.valueOf()) { %>
 									<option value="<%= cd._id %>" selected><%= cd.TenChuDe %></option>
 								<% } else { %>
 									<option value="<%= cd._id %>"><%= cd.TenChuDe %></option>
@@ -61,7 +61,9 @@
 	<script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
 	<script>
 		CKEDITOR.replace('NoiDung', {
-			customConfig: 'https://trangtin-v3-1.onrender.com/js/config.js'
+			customConfig: 'https://trangtin-v3-1.onrender.com/js/config.js',
+			filebrowserUploadUrl: '/upload',
+			filebrowserUploadMethod: 'xhr'
 		});
 	</script>
 </body>

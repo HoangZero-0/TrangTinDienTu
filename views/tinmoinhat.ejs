@@ -18,7 +18,28 @@
 		<div class="card mt-3">
 			<div class="card-header"><%= title %></div>
 			<div class="card-body">
-				<p class="card-text">Tin mới nhất đang cập nhật.</p>
+				<% if(typeof baiviet !== "undefined" && baiviet.length > 0) { %>
+					<div class="row">
+					<% baiviet.forEach(bv => { %>
+						<div class="col-md-4 mb-4">
+							<article class="card h-100">
+								<a href="/baiviet/chitiet/<%= bv._id %>">
+									<img class="card-img-top" src="<%- firstImage(bv.NoiDung) %>" alt="" />
+								</a>
+								<div class="card-body">
+									<a href="/baiviet/chitiet/<%= bv._id %>" class="text-decoration-none text-dark">
+										<h5 class="card-title"><%= bv.TieuDe %></h5>
+									</a>
+									<p class="card-text text-muted small"><i class="bi bi-clock"></i> <%= new Date(bv.NgayDang).toLocaleDateString('vi-VN') %></p>
+									<p class="card-text"><%= bv.TomTat %></p>
+								</div>
+							</article>
+						</div>
+					<% }); %>
+					</div>
+				<% } else { %>
+					<p class="card-text">Không có thông tin.</p>
+				<% } %>
 			</div>
 		</div>
 		
@@ -27,6 +48,7 @@
 	</div>
 	
 	<%- include('javascript') %>
+	<script src="/js/weather.js"></script>
 </body>
 
 </html>

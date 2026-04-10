@@ -38,7 +38,9 @@
 									<a href="/chude/sua/<%= cd._id %>"><i class="bi bi-pencil-square"></i></a></a>
 								</td>
 								<td class="align-middle text-center">
-									<a href="/chude/xoa/<%= cd._id %>" onclick="return confirm('Bạn có muốn xóa chủ đề <%= cd.TenChuDe %> không?');"><i class="bi bi-trash text-danger"></i></a>
+									<form action="/chude/xoa/<%= cd._id %>" method="POST" style="display:inline;" onsubmit="return confirm('Bạn có muốn xóa chủ đề <%= cd.TenChuDe %> không?');">
+									<button type="submit" class="btn btn-sm btn-link p-0"><i class="bi bi-trash text-danger"></i></button>
+								</form>
 								</td>
 							</tr>
 						<% }); %>

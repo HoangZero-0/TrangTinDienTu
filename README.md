@@ -1,36 +1,112 @@
-# Dự án TrangTin_v3.1
+# 📰 TrangTin — Trang Tin Điện Tử
 
-Đây là một dự án website trang tin tức được xây dựng trên nền tảng Node.js. 
+Website trang tin tức cho phép người dùng đăng bài viết, bình luận và quản trị viên kiểm duyệt nội dung. Xây dựng trên nền tảng Node.js với kiến trúc MVC.
 
-## Công nghệ sử dụng
-* **Backend:** Node.js, Express.js
-* **Cơ sở dữ liệu:** MongoDB
-* **Template Engine:** EJS
-* **Bảo mật:** bcrypt (mã hóa mật khẩu)
+## 🚀 Công nghệ sử dụng
 
-## Yêu cầu hệ thống
-Để chạy được dự án này trên máy tính, bạn cần cài đặt sẵn:
-* Node.js (phiên bản 14.x trở lên)
-* MongoDB (đang chạy local hoặc dùng MongoDB Atlas)
+| Thành phần          | Công nghệ                                |
+| ------------------- | ---------------------------------------- |
+| **Backend**         | Node.js, Express.js 5                    |
+| **Database**        | MongoDB Atlas, Mongoose                  |
+| **Template Engine** | EJS                                      |
+| **Authentication**  | bcryptjs, express-session, connect-mongo |
+| **Upload**          | Multer                                   |
+| **Soạn thảo**       | CKEditor 4                               |
+| **Frontend**        | Bootstrap 5, CSS custom                  |
+| **Env**             | dotenv                                   |
 
-## Hướng dẫn cài đặt và chạy dự án
+## 📁 Cấu trúc dự án
 
-**Bước 1: Tải mã nguồn về máy**
-Mở Terminal và chạy lệnh sau để clone project:
-git clone https://github.com/HoangZero-0/TrangTin_v3.1.git
+```
+├── index.js            # Điểm khởi đầu ứng dụng
+├── .env                # Biến môi trường (MONGO_URI) — không push lên Git
+├── models/             # Schema MongoDB (TaiKhoan, ChuDe, BaiViet, BinhLuan)
+├── routers/            # Route handlers (auth, baiviet, binhluan, chude, taikhoan, index)
+├── modules/            # Middleware & utilities (auth check, upload, firstimage)
+├── views/              # Giao diện EJS (pages + partials)
+│   ├── navbar_public.ejs   # Navbar public (dùng chung)
+│   ├── footer_public.ejs   # Footer public (dùng chung)
+│   ├── navbar.ejs          # Navbar admin
+│   └── ...                 # Các trang view
+└── public/             # Tài nguyên tĩnh (CSS, JS, Images)
+```
 
-**Bước 2: Di chuyển vào thư mục dự án**
-cd trangtin_v3.1
+## ✨ Tính năng chính
 
-**Bước 3: Cài đặt các thư viện (Dependencies)**
-Vì thư mục `node_modules` đã được bỏ qua khi đẩy lên GitHub để giảm dung lượng, bạn cần chạy lệnh này để tải lại toàn bộ thư viện cần thiết:
+### Người dùng (User)
+
+- Đăng ký tài khoản (có upload ảnh đại diện)
+- Đăng nhập / Đăng xuất
+- Đăng bài viết (soạn thảo CKEditor, chờ admin duyệt)
+- Sửa / Xóa bài viết của mình
+- Gửi bình luận (sau khi đăng nhập)
+- Cập nhật hồ sơ cá nhân
+
+### Quản trị viên (Admin)
+
+- Dashboard thống kê (chủ đề, bài viết, tài khoản)
+- Duyệt / Bỏ duyệt bài viết và bình luận
+- CRUD chủ đề (kiểm tra bài viết liên quan trước khi xóa)
+- CRUD tài khoản (khóa / mở, đổi quyền)
+
+### Độc giả (Guest)
+
+- Xem trang chủ (phân trang, sidebar xem nhiều nhất)
+- Xem chi tiết bài viết (đếm lượt xem, chống spam view)
+- Tìm kiếm bài viết
+- Xem bài theo chuyên mục
+- Trang Liên hệ, Chính sách riêng tư
+
+## 🔒 Bảo mật
+
+- Mã hóa mật khẩu bằng **bcrypt**
+- Middleware phân quyền (`isAuth`, `isAdmin`)
+- Chống **IDOR** (kiểm tra sở hữu bài viết)
+- Chống **ReDoS** (escape regex tìm kiếm)
+- **HTTP Method Safety** (xóa/duyệt dùng POST)
+- MongoDB URI lưu trong `.env` (không hardcode)
+
+## ⚙️ Hướng dẫn cài đặt
+
+### Yêu cầu
+
+- Node.js (v14+)
+- MongoDB Atlas hoặc MongoDB local
+
+### Các bước
+
+**1. Clone dự án**
+
+```bash
+git clone https://github.com/YOUR_USERNAME/TrangTinDienTu.git
+cd TrangTinDienTu
+```
+
+**2. Cài đặt dependencies**
+
+```bash
 npm install
+```
 
-**Bước 4: Chạy ứng dụng**
-Khởi động server bằng lệnh:
+**3. Tạo file `.env`**
+
+```env
+MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/trangtin
+```
+
+**4. Chạy ứng dụng**
+
+```bash
+# Development (auto-reload)
+npm run dev
+
+# Production
 npm start
+```
 
-Trang web sẽ hoạt động tại địa chỉ: `http://localhost:3000`.
+Truy cập: `http://localhost:3000`
 
-## Tác giả
-* **HoangZero-0** - [Link GitHub](https://github.com/HoangZero-0)
+## 👨‍💻 Tác giả
+
+- **Nguyễn Hoàng Thức** — [HoangZero-0](https://github.com/HoangZero-0)
+- **Lê Nhật Quang**

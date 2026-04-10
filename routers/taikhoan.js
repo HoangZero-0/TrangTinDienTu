@@ -1,10 +1,13 @@
 var express = require('express');
 var router = express.Router();
 var bcrypt = require('bcryptjs');
+var fs = require('fs');
 var TaiKhoan = require('../models/taikhoan');
+var { isAuth, isAdmin } = require('../modules/middlewares');
+var upload = require('../modules/upload');
 
 // GET: Danh sách tài khoản
-router.get('/', async (req, res) => {
+router.get('/', isAdmin, async (req, res) => {
 	var tk = await TaiKhoan.find();
 	res.render('taikhoan', {
 		title: 'Danh sách tài khoản',
@@ -13,28 +16,28 @@ router.get('/', async (req, res) => {
 });
 
 // GET: Thêm tài khoản
-router.get('/them', async (req, res) => {
+router.get('/them', isAdmin, async (req, res) => {
 	res.render('taikhoan_them', {
 		title: 'Thêm tài khoản'
 	});
 });
 
 // POST: Thêm tài khoản
-router.post('/them', async (req, res) => {
+router.post('/them', isAdmin, upload.single('HinhAnh'), async (req, res) => {
 	var salt = bcrypt.genSaltSync(10);
 	var data = {
 		HoVaTen: req.body.HoVaTen,
 		Email: req.body.Email,
-		HinhAnh: req.body.HinhAnh,
 		TenDangNhap: req.body.TenDangNhap,
 		MatKhau: bcrypt.hashSync(req.body.MatKhau, salt)
 	};
+	if(req.file) data.HinhAnh = '/images/uploads/' + req.file.filename;
 	await TaiKhoan.create(data);
 	res.redirect('/taikhoan');
 });
 
 // GET: Sửa tài khoản
-router.get('/sua/:id', async (req, res) => {
+router.get('/sua/:id', isAdmin, async (req, res) => {
 	var id = req.params.id;
 	var tk = await TaiKhoan.findById(id);
 	res.render('taikhoan_sua', {
@@ -44,28 +47,81 @@ router.get('/sua/:id', async (req, res) => {
 });
 
 // POST: Sửa tài khoản
-router.post('/sua/:id', async (req, res) => {
+router.post('/sua/:id', isAdmin, upload.single('HinhAnh'), async (req, res) => {
 	var id = req.params.id;
 	var salt = bcrypt.genSaltSync(10);
 	var data = {
 		HoVaTen: req.body.HoVaTen,
 		Email: req.body.Email,
-		HinhAnh: req.body.HinhAnh,
 		TenDangNhap: req.body.TenDangNhap,
 		QuyenHan: req.body.QuyenHan,
 		KichHoat: req.body.KichHoat
 	};
+	if(req.file) {
+		data.HinhAnh = '/images/uploads/' + req.file.filename;
+		var tk = await TaiKhoan.findById(id);
+		if(tk && tk.HinhAnh) {
+			try {
+				var filePath = './public' + tk.HinhAnh;
+				if(fs.existsSync(filePath)) fs.unlinkSync(filePath);
+			} catch(err) {}
+		}
+	}
 	if(req.body.MatKhau)
 		data['MatKhau'] = bcrypt.hashSync(req.body.MatKhau, salt);
 	await TaiKhoan.findByIdAndUpdate(id, data);
 	res.redirect('/taikhoan');
 });
 
-// GET: Xóa tài khoản
-router.get('/xoa/:id', async (req, res) => {
+// POST: Xóa tài khoản
+router.post('/xoa/:id', isAdmin, async (req, res) => {
 	var id = req.params.id;
+	var tk = await TaiKhoan.findById(id);
+	if(tk && tk.HinhAnh) {
+		try {
+			var filePath = './public' + tk.HinhAnh;
+			if(fs.existsSync(filePath)) fs.unlinkSync(filePath);
+		} catch(err) {}
+	}
 	await TaiKhoan.findByIdAndDelete(id);
 	res.redirect('/taikhoan');
+});
+
+// GET: Hồ sơ cá nhân
+router.get('/hoso', isAuth, async (req, res) => {
+	var id = req.session.MaNguoiDung;
+	var tk = await TaiKhoan.findById(id);
+	res.render('taikhoan_hoso', {
+		title: 'Hồ sơ cá nhân',
+		taikhoan: tk
+	});
+});
+
+// POST: Hồ sơ cá nhân
+router.post('/hoso', isAuth, upload.single('HinhAnh'), async (req, res) => {
+	var id = req.session.MaNguoiDung;
+	var salt = bcrypt.genSaltSync(10);
+	var data = {
+		HoVaTen: req.body.HoVaTen,
+		Email: req.body.Email
+	};
+	if(req.file) {
+		data.HinhAnh = '/images/uploads/' + req.file.filename;
+		var tk = await TaiKhoan.findById(id);
+		if(tk && tk.HinhAnh) {
+			try {
+				var filePath = './public' + tk.HinhAnh;
+				if(fs.existsSync(filePath)) fs.unlinkSync(filePath);
+			} catch(err) {}
+		}
+	}
+	if(req.body.MatKhau)
+		data['MatKhau'] = bcrypt.hashSync(req.body.MatKhau, salt);
+	await TaiKhoan.findByIdAndUpdate(id, data);
+	
+	req.session.HoVaTen = req.body.HoVaTen;
+	req.session.success = 'Đã cập nhật hồ sơ cá nhân thành công.';
+	res.redirect('/taikhoan/hoso');
 });
 
 module.exports = router;
