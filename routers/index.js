@@ -106,8 +106,28 @@ router.get('/baiviet/chitiet/:id', async (req, res) => {
 
 	// Lấy bình luận của bài viết
 	var bl = await BinhLuan.find({ BaiViet: id, KiemDuyet: 1 })
-		.sort({ NgayBinhLuan: -1 })
+		.sort({ NgayBinhLuan: 1 }) // Sắp xếp theo thứ tự thời gian tăng dần
 		.populate('TaiKhoan').exec();
+
+	// Tổ chức bình luận theo phân cấp (cha-con)
+	var rootComments = bl.filter(c => !c.BinhLuanCha);
+	var replies = bl.filter(c => c.BinhLuanCha);
+	
+	rootComments.forEach(parent => {
+		parent.replies = replies.filter(child => child.BinhLuanCha.toString() === parent._id.toString());
+	});
+
+	// Xử lý bài viết liên quan (cùng chủ đề, giới hạn 4 bài)
+	var bvlq = [];
+	if (bv.ChuDe) {
+		bvlq = await BaiViet.find({ 
+			KiemDuyet: 1, 
+			ChuDe: bv.ChuDe._id, 
+			_id: { $ne: id } // Loại trừ bài viết hiện tại
+		})
+		.sort({ NgayDang: -1 })
+		.limit(4).exec();
+	}
 
 	// Xử lý tăng lượt xem bài viết
 	if(!req.session.DaXem) req.session.DaXem = [];
@@ -126,7 +146,8 @@ router.get('/baiviet/chitiet/:id', async (req, res) => {
 	res.render('baiviet_chitiet', {
 		chuyenmuc: cm,
 		baiviet: bv,
-		binhluan: bl,
+		binhluan: rootComments,
+		baivietlienquan: bvlq,
 		xemnhieunhat: xnn,
 		firstImage: firstImage
 	});
@@ -140,6 +161,8 @@ router.post('/binhluan/:id', isAuth, async (req, res) => {
 		TaiKhoan: req.session.MaNguoiDung,
 		NoiDung: req.body.NoiDung
 	};
+	if (req.body.BinhLuanCha) data.BinhLuanCha = req.body.BinhLuanCha;
+	
 	await BinhLuan.create(data);
 	res.redirect('/baiviet/chitiet/' + id);
 });

@@ -54,7 +54,7 @@
   - `TaiKhoan`: HoVaTen, Email, HinhAnh, TenDangNhap (unique), MatKhau (bcrypt hashed), QuyenHan (user/admin), KichHoat (0/1).
   - `ChuDe`: TenChuDe (unique, required). Không thể xóa nếu còn bài viết liên quan.
   - `BaiViet`: ChuDe (ref), TaiKhoan (ref), TieuDe, TomTat, NoiDung, NgayDang, LuotXem, KiemDuyet (0/1).
-  - `BinhLuan`: BaiViet (ref), TaiKhoan (ref), NoiDung, NgayBinhLuan, KiemDuyet (0/1).
+  - `BinhLuan`: BaiViet (ref), TaiKhoan (ref), NoiDung, NgayBinhLuan, KiemDuyet (0/1), BinhLuanCha (ref - dùng cho trả lời bình luận).
 
 # 6. LUỒNG HOẠT ĐỘNG CHÍNH (CORE FLOWS)
 
@@ -84,8 +84,8 @@
 ## Flow 4: Hiển thị & Tương tác (Độc giả)
 
 - **Trang chủ:** Tin mới nhất (phân trang 12 bài/trang), sidebar "Xem nhiều nhất" + "Thẻ chuyên mục".
-- **Chi tiết bài viết:** Tăng lượt xem (session-based, tránh spam). Chặn xem bài chưa duyệt trừ admin/tác giả.
-- **Bình luận:** Yêu cầu đăng nhập, hiển thị sau khi admin duyệt.
+- **Chi tiết bài viết:** Tăng lượt xem (session-based, tránh spam). Chặn xem bài chưa duyệt trừ admin/tác giả. Hiển thị 4 bài viết liên quan (cùng chủ đề).
+- **Bình luận:** Yêu cầu đăng nhập. Hỗ trợ bình luận hai cấp (gốc và trả lời). Phản hồi kế thừa trạng thái kiểm duyệt (có thể ẩn/hiện theo nhóm).
 - **Tìm kiếm:** Escape regex chống ReDoS, hiển thị kết quả dạng card.
 - **Chuyên mục:** Xem bài theo chủ đề, dropdown menu navbar.
 - **Tin mới nhất:** API `/tinmoi`, hiển thị 50 bài mới nhất.
@@ -124,6 +124,7 @@
 - [x] Kiến trúc: Tách navbar public thành `navbar_public.ejs` (6 trang dùng chung).
 - [x] Kiến trúc: Tách footer public thành `footer_public.ejs` (6 trang dùng chung).
 - [x] UI: Đổi footer từ bg-dark sang tone #2c3e50 (navy đậm).
+- [x] Tính năng: Trả lời bình luận (threaded comments) và Bài viết liên quan (related posts).
 
 ## Đang tiến hành (In Progress)
 
