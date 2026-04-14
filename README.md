@@ -4,16 +4,16 @@ Website trang tin tức cho phép người dùng đăng bài viết, bình luậ
 
 ## 🚀 Công nghệ sử dụng
 
-| Thành phần          | Công nghệ                                |
-| ------------------- | ---------------------------------------- |
-| **Backend**         | Node.js, Express.js 5                    |
-| **Database**        | MongoDB Atlas, Mongoose                  |
-| **Template Engine** | EJS                                      |
-| **Authentication**  | bcryptjs, express-session, connect-mongo |
-| **Upload**          | Multer                                   |
-| **Soạn thảo**       | CKEditor 4                               |
-| **Frontend**        | Bootstrap 5, CSS custom                  |
-| **Env**             | dotenv                                   |
+| Thành phần          | Công nghệ                                        |
+| ------------------- | ------------------------------------------------ |
+| **Backend**         | Node.js, Express.js 5                            |
+| **Database**        | MongoDB Atlas, Mongoose                          |
+| **Template Engine** | EJS                                              |
+| **Authentication**  | bcryptjs, express-session, connect-mongo         |
+| **Upload**          | Multer                                           |
+| **Soạn thảo**       | CKEditor 4                                       |
+| **Frontend**        | Bootstrap 5, CSS custom, Sticky Footer (Flexbox) |
+| **Env**             | dotenv                                           |
 
 ## 📁 Cấu trúc dự án
 
@@ -40,6 +40,8 @@ Website trang tin tức cho phép người dùng đăng bài viết, bình luậ
 - Đăng bài viết (soạn thảo CKEditor, chờ admin duyệt)
 - Sửa / Xóa bài viết của mình
 - Gửi bình luận (sau khi đăng nhập)
+- Trả lời bình luận (threaded comments — hỗ trợ 2 cấp: gốc và phản hồi)
+- Lưu bài viết yêu thích (Bookmark) và xem lại danh sách đã lưu
 - Cập nhật hồ sơ cá nhân
 
 ### Quản trị viên (Admin)
@@ -51,10 +53,12 @@ Website trang tin tức cho phép người dùng đăng bài viết, bình luậ
 
 ### Độc giả (Guest)
 
-- Xem trang chủ (phân trang, sidebar xem nhiều nhất)
-- Xem chi tiết bài viết (đếm lượt xem, chống spam view)
+- Xem trang chủ (phân trang 12 bài/trang, sidebar xem nhiều nhất + thẻ chuyên mục)
+- Xem chi tiết bài viết (đếm lượt xem session-based, chống spam view)
+- Xem 4 bài viết liên quan (cùng chuyên mục) ở cuối bài
 - Tìm kiếm bài viết
-- Xem bài theo chuyên mục
+- Xem bài theo chuyên mục (dropdown menu)
+- Xem 50 tin mới nhất (`/tinmoi`)
 - Trang Liên hệ, Chính sách riêng tư
 
 ## 🔒 Bảo mật

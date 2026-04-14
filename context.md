@@ -21,11 +21,11 @@
   /modules          # Các hàm tiện ích và Middleware (middlewares.js, upload.js, firstimage.js)
   /views            # Giao diện EJS (pages + partials)
     navbar.ejs          # Navbar trang admin
-    navbar_public.ejs   # Navbar trang public (partial dùng chung 6 trang)
+    navbar_public.ejs   # Navbar trang public (partial dùng chung 7 trang)
     footer.ejs          # Footer trang admin
-    footer_public.ejs   # Footer trang public (partial dùng chung 6 trang)
+    footer_public.ejs   # Footer trang public (partial dùng chung 7 trang)
   /public           # Tài nguyên tĩnh (CSS, JS, Images)
-    /css/app.css        # Bootstrap 5.1.3 minified + CSS custom
+    /css/app.css        # Bootstrap 5.1.3 minified + CSS custom + Sticky Footer (Flexbox)
     /js/app.js          # JS chung (timeago, Bootstrap bundle)
     /js/weather.js      # Widget thời tiết + đồng hồ
     /js/config.js       # CKEditor custom config
@@ -51,7 +51,7 @@
 # 5. NGHIỆP VỤ & THỰC THỂ CHÍNH (DOMAIN & CORE ENTITIES)
 
 - **Các Model cốt lõi:**
-  - `TaiKhoan`: HoVaTen, Email, HinhAnh, TenDangNhap (unique), MatKhau (bcrypt hashed), QuyenHan (user/admin), KichHoat (0/1).
+  - `TaiKhoan`: HoVaTen, Email, HinhAnh, TenDangNhap (unique), MatKhau (bcrypt hashed), QuyenHan (user/admin), KichHoat (0/1), BaiVietDaLuu (array of refs).
   - `ChuDe`: TenChuDe (unique, required). Không thể xóa nếu còn bài viết liên quan.
   - `BaiViet`: ChuDe (ref), TaiKhoan (ref), TieuDe, TomTat, NoiDung, NgayDang, LuotXem, KiemDuyet (0/1).
   - `BinhLuan`: BaiViet (ref), TaiKhoan (ref), NoiDung, NgayBinhLuan, KiemDuyet (0/1), BinhLuanCha (ref - dùng cho trả lời bình luận).
@@ -84,14 +84,15 @@
 ## Flow 4: Hiển thị & Tương tác (Độc giả)
 
 - **Trang chủ:** Tin mới nhất (phân trang 12 bài/trang), sidebar "Xem nhiều nhất" + "Thẻ chuyên mục".
-- **Chi tiết bài viết:** Tăng lượt xem (session-based, tránh spam). Chặn xem bài chưa duyệt trừ admin/tác giả. Hiển thị 4 bài viết liên quan (cùng chủ đề).
-- **Bình luận:** Yêu cầu đăng nhập. Hỗ trợ bình luận hai cấp (gốc và trả lời). Phản hồi kế thừa trạng thái kiểm duyệt (có thể ẩn/hiện theo nhóm).
+- **Chi tiết bài viết:** Tăng lượt xem (session-based, tránh spam). Chặn xem bài chưa duyệt trừ admin/tác giả. Hiển thị 4 bài viết liên quan (cùng chủ đề). Cho phép lưu bài viết (Bookmark).
+- **Bình luận:** Yêu cầu đăng nhập. Hỗ trợ bình luận hai cấp (gốc và trả lời). Phản hồi kế thừa trạng thái kiểm duyệt.
+- **Bài viết đã lưu:** Xem danh sách bài viết độc giả đã lưu (route `/baiviet/daluu`, yêu cầu đăng nhập).
 - **Tìm kiếm:** Escape regex chống ReDoS, hiển thị kết quả dạng card.
 - **Chuyên mục:** Xem bài theo chủ đề, dropdown menu navbar.
 - **Tin mới nhất:** API `/tinmoi`, hiển thị 50 bài mới nhất.
 - **Trang tĩnh:** Liên hệ, Chính sách riêng tư.
 - **Upload ảnh:** CKEditor upload qua `/upload` (multer).
-- **Files:** `routers/index.js`, `views/index.ejs`, `views/baiviet_chitiet.ejs`, `views/baiviet_chude.ejs`, `views/timkiem.ejs`, `views/tinmoinhat.ejs`, `views/lienhe.ejs`, `views/chinhsach.ejs`.
+- **Files:** `routers/index.js`, `views/index.ejs`, `views/baiviet_chitiet.ejs`, `views/baiviet_daluu.ejs`, `views/baiviet_chude.ejs`, `views/timkiem.ejs`, `views/tinmoinhat.ejs`, `views/lienhe.ejs`, `views/chinhsach.ejs`.
 
 ## Flow 5: Hồ sơ cá nhân
 
@@ -121,10 +122,12 @@
 - [x] Logic: Global Error Handler (Express 5 async error handling).
 - [x] Logic: Null-safe check cho `bv.ChuDe` trong 7 views (phòng bài viết mồ côi).
 - [x] UI: Xóa newsletter giả khỏi 4 trang public.
-- [x] Kiến trúc: Tách navbar public thành `navbar_public.ejs` (6 trang dùng chung).
-- [x] Kiến trúc: Tách footer public thành `footer_public.ejs` (6 trang dùng chung).
+- [x] Kiến trúc: Tách navbar public thành `navbar_public.ejs` (7 trang dùng chung).
+- [x] Kiến trúc: Tách footer public thành `footer_public.ejs` (7 trang dùng chung).
 - [x] UI: Đổi footer từ bg-dark sang tone #2c3e50 (navy đậm).
 - [x] Tính năng: Trả lời bình luận (threaded comments) và Bài viết liên quan (related posts).
+- [x] Tính năng: Lưu bài viết (Bookmark) + view `baiviet_daluu.ejs` + link navbar "Đã lưu".
+- [x] UI: Sticky Footer (Flexbox) đảm bảo footer luôn ở dưới cùng trang.
 
 ## Đang tiến hành (In Progress)
 

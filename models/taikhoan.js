@@ -1,15 +1,16 @@
-var mongoose = require('mongoose');
+var mongoose = require("mongoose");
 
 var taiKhoanSchema = new mongoose.Schema({
-	HoVaTen: { type: String, required: true },
-	Email: { type: String },
-	HinhAnh: { type: String },
-	TenDangNhap: { type: String, unique: true, required: true },
-	MatKhau: { type: String, required: true },
-	QuyenHan: { type: String, default: 'user' },
-	KichHoat: { type: Number, default: 1 }
+  HoVaTen: { type: String, required: true },
+  Email: { type: String },
+  HinhAnh: { type: String },
+  TenDangNhap: { type: String, unique: true, required: true },
+  MatKhau: { type: String, required: true },
+  QuyenHan: { type: String, default: "user" },
+  KichHoat: { type: Number, default: 1 },
+  BaiVietDaLuu: [{ type: mongoose.Schema.Types.ObjectId, ref: "BaiViet" }],
 });
 
-var taiKhoanModel = mongoose.model('TaiKhoan', taiKhoanSchema);
+var taiKhoanModel = mongoose.model("TaiKhoan", taiKhoanSchema);
 
 module.exports = taiKhoanModel;

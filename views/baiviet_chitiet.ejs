@@ -34,6 +34,21 @@
 										<%= baiviet.TieuDe %>
 									</h3>
 								</a>
+								<div class="mt-2">
+									<% if(typeof session !== "undefined" && session.MaNguoiDung) { %>
+										<form action="/baiviet/luu/<%= baiviet._id %>" method="POST" style="display: inline;">
+											<% if(daLuu) { %>
+												<button type="submit" class="btn btn-outline-danger btn-sm">
+													<i class="bi bi-heart-fill"></i> Đã lưu bài viết
+												</button>
+											<% } else { %>
+												<button type="submit" class="btn btn-outline-secondary btn-sm">
+													<i class="bi bi-heart"></i> Lưu bài viết
+												</button>
+											<% } %>
+										</form>
+									<% } %>
+								</div>
 							</header>
 							<div class="card-body">
 								<p style="text-align:justify;"><strong>

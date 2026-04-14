@@ -92,3 +92,18 @@ main.main {
     padding-top: 35px !important; /* Nếu bạn thu nhỏ Header, hãy giảm số này xuống (ví dụ: 35px) */
 }
 
+
+/* Sticky Footer Logic */
+html, body {
+	height: 100%;
+}
+body {
+	display: flex;
+	flex-direction: column;
+}
+main.main {
+	flex: 1 0 auto;
+}
+footer.site-footer {
+	flex-shrink: 0;
+}

@@ -5,6 +5,7 @@ var upload = require('../modules/upload');
 var ChuDe = require('../models/chude');
 var BaiViet = require('../models/baiviet');
 var BinhLuan = require('../models/binhluan');
+var TaiKhoan = require('../models/taikhoan');
 var { isAuth } = require('../modules/middlewares');
 
 // GET: Trang chủ
@@ -135,7 +136,6 @@ router.get('/baiviet/chitiet/:id', async (req, res) => {
 		await BaiViet.findByIdAndUpdate(id, { $inc: { LuotXem: 1 } });
 		req.session.DaXem.push(id);
 	}
-
 	// Lấy 3 bài viết xem nhiều nhất hiển thị vào cột phải
 	var xnn = await BaiViet.find({ KiemDuyet: 1 })
 		.sort({ LuotXem: -1 })
@@ -143,13 +143,23 @@ router.get('/baiviet/chitiet/:id', async (req, res) => {
 		.populate('TaiKhoan')
 		.limit(3).exec();
 
+	// Kiểm tra bài viết đã lưu chưa (nếu đã đăng nhập)
+	var daLuu = false;
+	if (req.session.MaNguoiDung) {
+		var user = await TaiKhoan.findById(req.session.MaNguoiDung);
+		if (user && user.BaiVietDaLuu.includes(id)) {
+			daLuu = true;
+		}
+	}
+
 	res.render('baiviet_chitiet', {
 		chuyenmuc: cm,
 		baiviet: bv,
 		binhluan: rootComments,
 		baivietlienquan: bvlq,
 		xemnhieunhat: xnn,
-		firstImage: firstImage
+		firstImage: firstImage,
+		daLuu: daLuu
 	});
 });
 
@@ -165,6 +175,45 @@ router.post('/binhluan/:id', isAuth, async (req, res) => {
 	
 	await BinhLuan.create(data);
 	res.redirect('/baiviet/chitiet/' + id);
+});
+
+// POST: Lưu hoặc bỏ lưu bài viết
+router.post('/baiviet/luu/:id', isAuth, async (req, res) => {
+	var id = req.params.id;
+	var userId = req.session.MaNguoiDung;
+	
+	var user = await TaiKhoan.findById(userId);
+	if (!user) return res.json({ success: false });
+
+	var index = user.BaiVietDaLuu.indexOf(id);
+	if (index === -1) {
+		// Chưa lưu thì thêm vào
+		user.BaiVietDaLuu.push(id);
+	} else {
+		// Đã lưu thì xóa đi
+		user.BaiVietDaLuu.splice(index, 1);
+	}
+	
+	await user.save();
+	res.redirect(req.get('Referrer') || '/baiviet/chitiet/' + id);
+});
+
+// GET: Danh sách bài viết đã lưu
+router.get('/baiviet/daluu', isAuth, async (req, res) => {
+	var cm = await ChuDe.find();
+	var userId = req.session.MaNguoiDung;
+	
+	var user = await TaiKhoan.findById(userId).populate({
+		path: 'BaiVietDaLuu',
+		populate: { path: 'ChuDe' }
+	}).exec();
+
+	res.render('baiviet_daluu', {
+		title: 'Bài viết đã lưu',
+		chuyenmuc: cm,
+		baiviet: user ? user.BaiVietDaLuu : [],
+		firstImage: firstImage
+	});
 });
 
 // GET: Liên hệ
