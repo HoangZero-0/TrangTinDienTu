@@ -9,6 +9,10 @@ var upload = require('../modules/upload');
 
 // GET: Đăng ký
 router.get('/dangky', async (req, res) => {
+	if (req.session.MaNguoiDung) {
+		req.session.success = 'Bạn đã đăng nhập rồi.';
+		return req.session.save(() => res.redirect('/'));
+	}
 	res.render('dangky', {
 		title: 'Đăng ký tài khoản'
 	});
@@ -54,6 +58,10 @@ router.post('/dangky', upload.single('HinhAnh'), async (req, res) => {
 
 // GET: Đăng nhập
 router.get('/dangnhap', async (req, res) => {
+	if (req.session.MaNguoiDung) {
+		req.session.success = 'Bạn đã đăng nhập rồi.';
+		return req.session.save(() => res.redirect('/'));
+	}
 	res.render('dangnhap', {
 		title: 'Đăng nhập'
 	});

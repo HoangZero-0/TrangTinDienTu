@@ -30,24 +30,20 @@ router.get('/them', isAuth, async (req, res) => {
 
 // POST: Đăng bài viết
 router.post('/them', isAuth, async (req, res) => {
-	if (req.session.MaNguoiDung) {
-		try {
-			var data = {
-				ChuDe: req.body.MaChuDe,
-				TaiKhoan: req.session.MaNguoiDung,
-				TieuDe: req.body.TieuDe,
-				TomTat: req.body.TomTat,
-				NoiDung: req.body.NoiDung
-			};
-			await BaiViet.create(data);
-			req.session.success = 'Đã đăng bài viết thành công và đang chờ kiểm duyệt.';
-			req.session.save(() => res.redirect('/baiviet/cuatoi'));
-		} catch (err) {
-			req.session.error = 'Lỗi hệ thống: ' + err.message;
-			req.session.save(() => res.redirect('/baiviet/them'));
-		}
-	} else {
-		res.redirect('/dangnhap');
+	try {
+		var data = {
+			ChuDe: req.body.MaChuDe,
+			TaiKhoan: req.session.MaNguoiDung,
+			TieuDe: req.body.TieuDe,
+			TomTat: req.body.TomTat,
+			NoiDung: req.body.NoiDung
+		};
+		await BaiViet.create(data);
+		req.session.success = 'Đã đăng bài viết thành công và đang chờ kiểm duyệt.';
+		req.session.save(() => res.redirect('/baiviet/cuatoi'));
+	} catch (err) {
+		req.session.error = 'Lỗi hệ thống: ' + err.message;
+		req.session.save(() => res.redirect('/baiviet/them'));
 	}
 });
 
@@ -164,20 +160,15 @@ router.post('/duyet/:id', isAdmin, async (req, res) => {
 
 // GET: Danh sách bài viết của tôi
 router.get('/cuatoi', isAuth, async (req, res) => {
-	if (req.session.MaNguoiDung) {
-		// Mã người dùng hiện tại
-		var id = req.session.MaNguoiDung;
-		var bv = await BaiViet.find({ TaiKhoan: id })
-			.populate('ChuDe')
-			.populate('TaiKhoan')
-			.sort({ _id: -1 }).exec();
-		res.render('baiviet_cuatoi', {
-			title: 'Bài viết của tôi',
-			baiviet: bv
-		});
-	} else {
-		res.redirect('/dangnhap');
-	}
+	var id = req.session.MaNguoiDung;
+	var bv = await BaiViet.find({ TaiKhoan: id })
+		.populate('ChuDe')
+		.populate('TaiKhoan')
+		.sort({ _id: -1 }).exec();
+	res.render('baiviet_cuatoi', {
+		title: 'Bài viết của tôi',
+		baiviet: bv
+	});
 });
 
 module.exports = router;

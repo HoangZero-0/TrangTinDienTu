@@ -13,7 +13,7 @@ function isAdmin(req, res, next) {
 		return next();
 	}
 	req.session.error = 'Bạn không có quyền truy cập trang quản trị.';
-	res.redirect('/error');
+	res.redirect('/');
 }
 
 module.exports = { isAuth, isAdmin };

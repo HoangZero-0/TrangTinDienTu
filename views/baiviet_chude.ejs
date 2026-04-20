@@ -72,15 +72,37 @@
 					</div>
 					<nav>
 						<ul class="pagination justify-content-center">
-							<li class="page-item disabled">
-								<a class="page-link" href="#" tabindex="-1" aria-disabled="true">Về trước</a>
-							</li>
-							<li class="page-item"><a class="page-link" href="#">1</a></li>
-							<li class="page-item"><a class="page-link" href="#">2</a></li>
-							<li class="page-item"><a class="page-link" href="#">3</a></li>
-							<li class="page-item">
-								<a class="page-link" href="#">Về sau</a>
-							</li>
+							<% if (pages > 0) { %>
+								<% if (current == 1) { %>
+									<li class="page-item disabled"><a class="page-link" href="#">Về trước</a></li>
+								<% } else { %>
+									<li class="page-item"><a class="page-link" href="/baiviet/chude/<%= chude._id %>?page=1">Đầu</a></li>
+									<li class="page-item"><a class="page-link" href="/baiviet/chude/<%= chude._id %>?page=<%= Number(current) - 1 %>">Về trước</a></li>
+								<% } %>
+								
+								<% var i = (Number(current) > 3 ? Number(current) - 2 : 1) %>
+								<% if (i !== 1) { %>
+									<li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+								<% } %>
+								
+								<% for (; i <= (Number(current) + 2) && i <= pages; i++) { %>
+									<% if (i == current) { %>
+										<li class="page-item active"><a class="page-link" href="#"><%= i %></a></li>
+									<% } else { %>
+										<li class="page-item"><a class="page-link" href="/baiviet/chude/<%= chude._id %>?page=<%= i %>"><%= i %></a></li>
+									<% } %>
+									<% if (i == Number(current) + 2 && i < pages) { %>
+										<li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+									<% } %>
+								<% } %>
+								
+								<% if (current == pages) { %>
+									<li class="page-item disabled"><a class="page-link" href="#">Về sau</a></li>
+								<% } else { %>
+									<li class="page-item"><a class="page-link" href="/baiviet/chude/<%= chude._id %>?page=<%= Number(current) + 1 %>">Về sau</a></li>
+									<li class="page-item"><a class="page-link" href="/baiviet/chude/<%= chude._id %>?page=<%= pages %>">Cuối</a></li>
+								<% } %>
+							<% } %>
 						</ul>
 					</nav>
 				</div>

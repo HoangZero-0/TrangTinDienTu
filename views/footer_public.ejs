@@ -2,8 +2,13 @@
 	<div class="container">
 		<ul class="nav justify-content-center">
 			<li class="nav-item"><a class="nav-link" href="/chinhsach" style="color: #bdc3c7;">Chính sách riêng tư</a></li>
-			<li class="nav-item"><a class="nav-link" href="/dangky" style="color: #bdc3c7;">Đăng ký</a></li>
-			<li class="nav-item"><a class="nav-link" href="/dangnhap" style="color: #bdc3c7;">Đăng nhập</a></li>
+			<% if(typeof session === "undefined" || !session.MaNguoiDung) { %>
+				<li class="nav-item"><a class="nav-link" href="/dangky" style="color: #bdc3c7;">Đăng ký</a></li>
+				<li class="nav-item"><a class="nav-link" href="/dangnhap" style="color: #bdc3c7;">Đăng nhập</a></li>
+			<% } else { %>
+				<li class="nav-item"><a class="nav-link" href="/taikhoan/hoso" style="color: #bdc3c7;">Hồ sơ</a></li>
+				<li class="nav-item"><a class="nav-link" href="/dangxuat" style="color: #bdc3c7;">Đăng xuất</a></li>
+			<% } %>
 			<li class="nav-item"><a class="nav-link" href="/lienhe" style="color: #bdc3c7;">Liên hệ</a></li>
 		</ul>
 		<div class="copy text-center py-3" style="color: #95a5a6;">

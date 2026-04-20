@@ -36,6 +36,15 @@ router.post("/them", isAdmin, upload.single("HinhAnh"), async (req, res) => {
       return req.session.save(() => res.redirect("/taikhoan/them"));
     }
 
+    // Kiểm tra trùng Email
+    if (email) {
+      var existingEmail = await TaiKhoan.findOne({ Email: email });
+      if (existingEmail) {
+        req.session.error = 'Email "' + email + '" đã được sử dụng bởi tài khoản khác.';
+        return req.session.save(() => res.redirect("/taikhoan/them"));
+      }
+    }
+
     var salt = bcrypt.genSaltSync(10);
     var data = {
       HoVaTen: req.body.HoVaTen,
@@ -79,6 +88,16 @@ router.post("/sua/:id", isAdmin, upload.single("HinhAnh"), async (req, res) => {
     if (existingUser) {
       req.session.error = 'Tên đăng nhập "' + tenDangNhap + '" đã tồn tại.';
       return req.session.save(() => res.redirect("/taikhoan/sua/" + id));
+    }
+
+    // Kiểm tra trùng Email với người khác
+    var email = req.body.Email;
+    if (email) {
+      var existingEmail = await TaiKhoan.findOne({ Email: email, _id: { $ne: id } });
+      if (existingEmail) {
+        req.session.error = 'Email "' + email + '" đã được sử dụng bởi tài khoản khác.';
+        return req.session.save(() => res.redirect("/taikhoan/sua/" + id));
+      }
     }
 
     var salt = bcrypt.genSaltSync(10);

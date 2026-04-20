@@ -51,11 +51,6 @@ app.use((req, res, next) => {
 	res.locals.toastError = err || '';
 	res.locals.toastSuccess = msg || '';
 	
-	// Giữ biến message cũ cho tương thích ngược
-	res.locals.message = '';
-	if (err) res.locals.message = '<span class="text-danger">' + err + '</span>';
-	if (msg) res.locals.message = '<span class="text-success">' + msg + '</span>';
-	
 	next();
 });
 

@@ -48,6 +48,8 @@ router.get('/', async (req, res) => {
 // GET: Lấy các bài viết cùng mã chủ đề
 router.get('/baiviet/chude/:id', async (req, res) => {
 	var id = req.params.id;
+	var perPage = 12;
+	var page = req.query.page || 1;
 
 	// Lấy chuyên mục hiển thị vào menu
 	var cm = await ChuDe.find();
@@ -55,15 +57,20 @@ router.get('/baiviet/chude/:id', async (req, res) => {
 	// Lấy thông tin chủ đề hiện tại
 	var cd = await ChuDe.findById(id);
 
-	// Lấy 8 bài viết mới nhất cùng chuyên mục
-	var bv = await BaiViet.find({ KiemDuyet: 1, ChuDe: id })
+	// Lấy bài viết cùng chuyên mục (phân trang)
+	var filter = { KiemDuyet: 1, ChuDe: id };
+	var bv = await BaiViet.find(filter)
 		.sort({ NgayDang: -1 })
 		.populate('ChuDe')
 		.populate('TaiKhoan')
-		.limit(8).exec();
+		.skip((perPage * page) - perPage)
+		.limit(perPage).exec();
+
+	var count = await BaiViet.countDocuments(filter);
+	var pages = Math.ceil(count / perPage);
 
 	// Lấy 3 bài viết xem nhiều nhất hiển thị vào cột phải
-	var xnn = await BaiViet.find({ KiemDuyet: 1, ChuDe: id })
+	var xnn = await BaiViet.find({ KiemDuyet: 1 })
 		.sort({ LuotXem: -1 })
 		.populate('ChuDe')
 		.populate('TaiKhoan')
@@ -75,6 +82,8 @@ router.get('/baiviet/chude/:id', async (req, res) => {
 		chude: cd,
 		baiviet: bv,
 		xemnhieunhat: xnn,
+		current: page,
+		pages: pages,
 		firstImage: firstImage
 	});
 });

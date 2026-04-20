@@ -21,7 +21,7 @@ router.post('/duyet/:id', isAdmin, async (req, res) => {
 		await bl.save();
 		req.session.success = (bl.KiemDuyet === 1 ? 'Đã duyệt' : 'Đã bỏ duyệt') + ' bình luận thành công.';
 	}
-	res.redirect('/binhluan');
+	return res.redirect('/binhluan');
 });
 
 // POST: Xóa bình luận
