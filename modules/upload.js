@@ -12,6 +12,6 @@ var storage = multer.diskStorage({
 
 var upload = multer({ 
 	storage: storage,
-	limits: { fileSize: 2 * 1024 * 1024 } // Giới hạn 2MB
+	limits: { fileSize: 10 * 1024 * 1024 } // Giới hạn 10MB
 });
 module.exports = upload;

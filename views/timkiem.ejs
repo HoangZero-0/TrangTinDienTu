@@ -53,6 +53,41 @@
 							</div>
 						</article>
 						<% }); %>
+
+						<!-- Phân trang -->
+						<% if (pages > 0) { %>
+							<nav class="mt-4">
+								<ul class="pagination justify-content-center">
+									<% if (current == 1) { %>
+										<li class="page-item disabled"><a class="page-link">Đầu</a></li>
+									<% } else { %>
+										<li class="page-item"><a class="page-link" href="/timkiem?tukhoa=<%= tukhoa %>&page=1">Đầu</a></li>
+									<% } %>
+
+									<% var i = (Number(current) > 5 ? Number(current) - 4 : 1) %>
+									<% if (i !== 1) { %>
+										<li class="page-item disabled"><a class="page-link">...</a></li>
+									<% } %>
+
+									<% for (; i <= (Number(current) + 4) && i <= pages; i++) { %>
+										<% if (i == current) { %>
+											<li class="page-item active"><a class="page-link"><%= i %></a></li>
+										<% } else { %>
+											<li class="page-item"><a class="page-link" href="/timkiem?tukhoa=<%= tukhoa %>&page=<%= i %>"><%= i %></a></li>
+										<% } %>
+										<% if (i == Number(current) + 4 && i < pages) { %>
+											<li class="page-item disabled"><a class="page-link">...</a></li>
+										<% } %>
+									<% } %>
+
+									<% if (current == pages) { %>
+										<li class="page-item disabled"><a class="page-link">Cuối</a></li>
+									<% } else { %>
+										<li class="page-item"><a class="page-link" href="/timkiem?tukhoa=<%= tukhoa %>&page=<%= pages %>">Cuối</a></li>
+									<% } %>
+								</ul>
+							</nav>
+						<% } %>
 					<% } else { %>
 						<div class="alert alert-primary" role="alert">
 							<h4 class="alert-heading">Rất tiếc!</h4>

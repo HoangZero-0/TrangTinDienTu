@@ -37,9 +37,11 @@
 					<div class="mb-3">
 						<label class="form-label" for="HinhAnh">Hình ảnh</label>
 						<% if(taikhoan.HinhAnh) { %>
-							<img src="<%= taikhoan.HinhAnh %>" class="img-thumbnail-account mb-2 d-block" />
+							<img src="<%= taikhoan.HinhAnh %>" id="previewImage" class="img-thumbnail mb-2 d-block" style="max-width: 250px; max-height: 250px; object-fit: cover;" />
+						<% } else { %>
+							<img src="" id="previewImage" class="img-thumbnail mb-2 d-none" style="max-width: 250px; max-height: 250px; object-fit: cover;" />
 						<% } %>
-						<input type="file" class="form-control" id="HinhAnh" name="HinhAnh" accept="image/*" />
+						<input type="file" class="form-control" id="HinhAnh" name="HinhAnh" accept="image/*" onchange="document.getElementById('previewImage').src = window.URL.createObjectURL(this.files[0]); document.getElementById('previewImage').classList.replace('d-none', 'd-block');" />
 					</div>
 					
 					<div class="mb-3">

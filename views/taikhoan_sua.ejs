@@ -32,9 +32,11 @@
 					<div class="mb-3">
 						<label class="form-label" for="HinhAnh">Hình ảnh</label>
 						<% if(taikhoan.HinhAnh) { %>
-							<img src="<%= taikhoan.HinhAnh %>" class="img-thumbnail-account mb-2 d-block" />
+							<img src="<%= taikhoan.HinhAnh %>" id="previewImage" class="img-thumbnail mb-2 d-block" style="max-width: 250px; max-height: 250px; object-fit: cover;" />
+						<% } else { %>
+							<img src="" id="previewImage" class="img-thumbnail mb-2 d-none" style="max-width: 250px; max-height: 250px; object-fit: cover;" />
 						<% } %>
-						<input type="file" class="form-control" id="HinhAnh" name="HinhAnh" accept="image/*" />
+						<input type="file" class="form-control" id="HinhAnh" name="HinhAnh" accept="image/*" onchange="document.getElementById('previewImage').src = window.URL.createObjectURL(this.files[0]); document.getElementById('previewImage').classList.replace('d-none', 'd-block');" />
 					</div>
 					
 					<div class="mb-3">
@@ -42,9 +44,10 @@
 						<input type="text" class="form-control" id="TenDangNhap" name="TenDangNhap" value="<%= taikhoan.TenDangNhap %>" required />
 					</div>
 					
+					<% var isSelf = (taikhoan._id == session.MaNguoiDung); %>
 					<div class="mb-3">
 						<label class="form-label" for="QuyenHan">Quyền hạn</label>
-						<select class="form-select" id="QuyenHan" name="QuyenHan" required>
+						<select class="form-select" id="QuyenHan" name="QuyenHan" required <%= isSelf ? "disabled" : "" %>>
 							<option value="admin" <%= taikhoan.QuyenHan == "admin" ? "selected" : "" %>>Quản trị viên</option>
 							<option value="user" <%= taikhoan.QuyenHan == "user" ? "selected" : "" %>>Thành viên</option>
 						</select>
@@ -53,11 +56,11 @@
 					<div class="mb-3">
 						<label class="form-label" for="KichHoat">Kích hoạt</label>
 						<div class="form-check">
-							<input class="form-check-input" type="radio" name="KichHoat" id="KichHoat1" value="1" <%= taikhoan.KichHoat == "1" ? "checked" : "" %> required />
+							<input class="form-check-input" type="radio" name="KichHoat" id="KichHoat1" value="1" <%= taikhoan.KichHoat == "1" ? "checked" : "" %> required <%= isSelf ? "disabled" : "" %> />
 							<label class="form-check-label" for="KichHoat1">Kích hoạt</label>
 						</div>
 						<div class="form-check">
-							<input class="form-check-input" type="radio" name="KichHoat" id="KichHoat0" value="0" <%= taikhoan.KichHoat == "0" ? "checked" : "" %> required />
+							<input class="form-check-input" type="radio" name="KichHoat" id="KichHoat0" value="0" <%= taikhoan.KichHoat == "0" ? "checked" : "" %> required <%= isSelf ? "disabled" : "" %> />
 							<label class="form-check-label" for="KichHoat0">Khóa tài khoản</label>
 						</div>
 					</div>

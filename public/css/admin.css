@@ -1,0 +1,148 @@
+/* Admin Dashboard Custom CSS */
+:root {
+    --sidebar-width: 260px;
+    --sidebar-bg: #1e293b;
+    --sidebar-hover: #334155;
+    --sidebar-active: #0d6efd;
+    --header-height: 70px;
+    --admin-bg: #f8fafc;
+}
+
+body {
+    background-color: var(--admin-bg);
+}
+
+/* Layout */
+.admin-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.admin-sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--sidebar-bg);
+    color: #f1f5f9;
+    position: fixed;
+    height: 100vh;
+    transition: all 0.3s;
+    z-index: 1000;
+}
+
+.admin-sidebar .sidebar-brand {
+    padding: 20px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border-bottom: 1px solid #334155;
+}
+
+.admin-sidebar .nav-link {
+    color: #cbd5e1;
+    padding: 12px 20px;
+    margin: 4px 10px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.admin-sidebar .nav-link i {
+    font-size: 1.2rem;
+    margin-right: 12px;
+}
+
+.admin-sidebar .nav-link:hover {
+    background-color: var(--sidebar-hover);
+    color: #fff;
+}
+
+.admin-sidebar .nav-link.active {
+    background-color: var(--sidebar-active);
+    color: #fff;
+}
+
+/* Main Content */
+.admin-main {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-header {
+    height: var(--header-height);
+    background: #fff;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 0 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+
+.admin-content {
+    padding: 30px;
+}
+
+/* Admin Cards */
+.admin-card {
+    background: #fff;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s;
+}
+
+.admin-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+/* Table styling in Admin */
+.admin-table-container {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.admin-table thead th {
+    background-color: #f8fafc;
+    border-bottom: 2px solid #e2e8f0;
+    padding: 12px;
+    font-weight: 600;
+}
+
+.admin-table td {
+    padding: 12px;
+    vertical-align: middle;
+}
+
+/* Utility */
+.badge-pill {
+    border-radius: 50rem;
+    padding: 0.35em 0.8em;
+}
+
+@media (max-width: 992px) {
+    .admin-sidebar {
+        margin-left: calc(-1 * var(--sidebar-width));
+    }
+    .admin-main {
+        margin-left: 0;
+    }
+    .admin-sidebar.show {
+        margin-left: 0;
+    }
+}

@@ -47,7 +47,11 @@ app.use((req, res, next) => {
 	delete req.session.error;
 	delete req.session.success;
 	
-	// Gán thông báo (lỗi, thành công) vào biến cục bộ
+	// Gán thông báo vào biến cục bộ cho Toast
+	res.locals.toastError = err || '';
+	res.locals.toastSuccess = msg || '';
+	
+	// Giữ biến message cũ cho tương thích ngược
 	res.locals.message = '';
 	if (err) res.locals.message = '<span class="text-danger">' + err + '</span>';
 	if (msg) res.locals.message = '<span class="text-success">' + msg + '</span>';
@@ -64,13 +68,28 @@ app.use('/binhluan', binhluanRouter);
 
 // Global Error Handler - Bắt tất cả lỗi từ async routes (Express 5)
 app.use((err, req, res, next) => {
+	var isUploadPath = req.path === '/upload';
+	
 	if (err.code === 'LIMIT_FILE_SIZE') {
-		req.session.error = 'Dung lượng file quá lớn, tối đa cho phép là 2MB.';
-		return res.redirect(req.get('Referrer') || '/error');
+		var errorMsg = 'Dung lượng file quá lớn, tối đa cho phép là 10MB.';
+		if (isUploadPath) {
+			return res.status(200).json({ uploaded: 0, error: { message: errorMsg } });
+		}
+		req.session.error = errorMsg;
+		return res.redirect(req.get('Referrer') || '/');
 	}
+	
 	console.error('[LỖI HỆ THỐNG]', err.message);
-	req.session.error = 'Đã xảy ra lỗi hệ thống, vui lòng thử lại.';
-	res.redirect('/error');
+	
+	if (isUploadPath) {
+		return res.status(200).json({ uploaded: 0, error: { message: 'Lỗi upload: ' + err.message } });
+	}
+	
+	req.session.error = 'Đã xảy ra lỗi hệ thống: ' + err.message;
+	var backURL = req.get('Referrer') || '/';
+	req.session.save(() => {
+		res.redirect(backURL);
+	});
 });
 
 app.listen(3000, () => {

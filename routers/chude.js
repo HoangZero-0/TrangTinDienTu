@@ -6,7 +6,7 @@ var { isAdmin } = require('../modules/middlewares');
 
 // GET: Danh sách chủ đề
 router.get('/', isAdmin, async (req, res) => {
-	var cd = await ChuDe.find();
+	var cd = await ChuDe.find().sort({ _id: -1 });
 	res.render('chude', {
 		title: 'Danh sách chủ đề',
 		chude: cd
@@ -22,12 +22,22 @@ router.get('/them', isAdmin, async (req, res) => {
 
 // POST: Thêm chủ đề
 router.post('/them', isAdmin, async (req, res) => {
-	var data = {
-		TenChuDe: req.body.TenChuDe
-	};
-	await ChuDe.create(data);
-	req.session.success = 'Đã thêm chủ đề thành công.';
-	res.redirect('/chude');
+	var tenChuDe = req.body.TenChuDe;
+	try {
+		// Kiểm tra trùng tên
+		var existing = await ChuDe.findOne({ TenChuDe: tenChuDe });
+		if (existing) {
+			req.session.error = 'Tên chủ đề "' + tenChuDe + '" đã tồn tại.';
+			return req.session.save(() => res.redirect('/chude/them'));
+		}
+		
+		await ChuDe.create({ TenChuDe: tenChuDe });
+		req.session.success = 'Đã thêm chủ đề thành công.';
+		req.session.save(() => res.redirect('/chude'));
+	} catch (err) {
+		req.session.error = 'Lỗi hệ thống: ' + err.message;
+		req.session.save(() => res.redirect('/chude/them'));
+	}
 });
 
 // GET: Sửa chủ đề
@@ -43,12 +53,22 @@ router.get('/sua/:id', isAdmin, async (req, res) => {
 // POST: Sửa chủ đề
 router.post('/sua/:id', isAdmin, async (req, res) => {
 	var id = req.params.id;
-	var data = {
-		TenChuDe: req.body.TenChuDe
-	};
-	await ChuDe.findByIdAndUpdate(id, data);
-	req.session.success = 'Đã cập nhật chủ đề thành công.';
-	res.redirect('/chude');
+	var tenChuDe = req.body.TenChuDe;
+	try {
+		// Kiểm tra trùng tên với các chủ đề khác
+		var existing = await ChuDe.findOne({ TenChuDe: tenChuDe, _id: { $ne: id } });
+		if (existing) {
+			req.session.error = 'Tên chủ đề "' + tenChuDe + '" đã tồn tại.';
+			return req.session.save(() => res.redirect('/chude/sua/' + id));
+		}
+
+		await ChuDe.findByIdAndUpdate(id, { TenChuDe: tenChuDe });
+		req.session.success = 'Đã cập nhật chủ đề thành công.';
+		req.session.save(() => res.redirect('/chude'));
+	} catch (err) {
+		req.session.error = 'Lỗi hệ thống: ' + err.message;
+		req.session.save(() => res.redirect('/chude/sua/' + id));
+	}
 });
 
 // POST: Xóa chủ đề
@@ -59,12 +79,17 @@ router.post('/xoa/:id', isAdmin, async (req, res) => {
 	var countBV = await BaiViet.countDocuments({ ChuDe: id });
 	if (countBV > 0) {
 		req.session.error = 'Không thể xóa chủ đề này vì còn ' + countBV + ' bài viết liên quan.';
-		return res.redirect('/error');
+		return req.session.save(() => res.redirect('/chude'));
 	}
 	
-	await ChuDe.findByIdAndDelete(id);
-	req.session.success = 'Đã xóa chủ đề thành công.';
-	res.redirect('/chude');
+	try {
+		await ChuDe.findByIdAndDelete(id);
+		req.session.success = 'Đã xóa chủ đề thành công.';
+		req.session.save(() => res.redirect('/chude'));
+	} catch (err) {
+		req.session.error = 'Lỗi hệ thống: ' + err.message;
+		req.session.save(() => res.redirect('/chude'));
+	}
 });
 
 module.exports = router;

@@ -5,7 +5,7 @@ var { isAdmin } = require('../modules/middlewares');
 
 // GET: Danh sách bình luận
 router.get('/', isAdmin, async (req, res) => {
-	var bl = await BinhLuan.find().populate('BaiViet').populate('TaiKhoan').sort({ NgayBinhLuan: -1 });
+	var bl = await BinhLuan.find().populate('BaiViet').populate('TaiKhoan').sort({ _id: -1 });
 	res.render('binhluan', {
 		title: 'Danh sách bình luận',
 		binhluan: bl
@@ -27,8 +27,11 @@ router.post('/duyet/:id', isAdmin, async (req, res) => {
 // POST: Xóa bình luận
 router.post('/xoa/:id', isAdmin, async (req, res) => {
 	var id = req.params.id;
+	// Xóa các phản hồi liên quan
+	await BinhLuan.deleteMany({ BinhLuanCha: id });
+	// Xóa chính nó
 	await BinhLuan.findByIdAndDelete(id);
-	req.session.success = 'Đã xóa bình luận thành công.';
+	req.session.success = 'Đã xóa bình luận và các phản hồi liên quan thành công.';
 	res.redirect('/binhluan');
 });
 

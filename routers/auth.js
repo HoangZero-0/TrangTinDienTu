@@ -19,7 +19,14 @@ router.post('/dangky', upload.single('HinhAnh'), async (req, res) => {
 	// Kiểm tra xác nhận mật khẩu
 	if (req.body.MatKhau !== req.body.XacNhanMatKhau) {
 		req.session.error = 'Mật khẩu xác nhận không khớp, vui lòng thử lại.';
-		return res.redirect('/error');
+		return req.session.save(() => res.redirect('/dangky'));
+	}
+	
+	// Kiểm tra Email đã tồn tại chưa
+	var existingEmail = await TaiKhoan.findOne({ Email: req.body.Email });
+	if (existingEmail) {
+		req.session.error = 'Email đã được sử dụng bởi một tài khoản khác.';
+		return req.session.save(() => res.redirect('/dangky'));
 	}
 	
 	var salt = bcrypt.genSaltSync(10);
@@ -34,14 +41,14 @@ router.post('/dangky', upload.single('HinhAnh'), async (req, res) => {
 	try {
 		await TaiKhoan.create(data);
 		req.session.success = 'Đã đăng ký tài khoản thành công.';
-		res.redirect('/success');
+		req.session.save(() => res.redirect('/dangnhap'));
 	} catch (err) {
 		if (err.code === 11000) {
-			req.session.error = 'Tên đăng nhập đã tồn tại, vui lòng chọn tên khác.';
+			req.session.error = 'Tên đăng nhập hoặc Email đã tồn tại, vui lòng chọn thông tin khác.';
 		} else {
 			req.session.error = 'Lỗi không xác định: ' + err.message;
 		}
-		res.redirect('/error');
+		req.session.save(() => res.redirect('/dangky'));
 	}
 });
 
@@ -62,22 +69,23 @@ router.post('/dangnhap', async (req, res) => {
 			if(bcrypt.compareSync(req.body.MatKhau, taikhoan.MatKhau)) {
 				if(taikhoan.KichHoat == 0) {
 					req.session.error = 'Người dùng đã bị khóa tài khoản.';
-					res.redirect('/error');
+					req.session.save(() => res.redirect('/dangnhap'));
 				} else {
 					// Đăng ký session
 					req.session.MaNguoiDung = taikhoan._id;
 					req.session.HoVaTen = taikhoan.HoVaTen;
 					req.session.QuyenHan = taikhoan.QuyenHan;
+					req.session.HinhAnh = taikhoan.HinhAnh;
 					
-					res.redirect('/');
+					req.session.save(() => res.redirect('/'));
 				}
 			} else {
 				req.session.error = 'Mật khẩu không đúng.';
-				res.redirect('/error');
+				req.session.save(() => res.redirect('/dangnhap'));
 			}
 		} else {
 			req.session.error = 'Tên đăng nhập không tồn tại.';
-			res.redirect('/error');
+			req.session.save(() => res.redirect('/dangnhap'));
 		}
 	}
 });
@@ -89,8 +97,9 @@ router.get('/dangxuat', async (req, res) => {
 		delete req.session.MaNguoiDung;
 		delete req.session.HoVaTen;
 		delete req.session.QuyenHan;
+		delete req.session.HinhAnh;
 	}
-	res.redirect('/');
+	req.session.save(() => res.redirect('/'));
 });
 
 // GET: Trang quản trị

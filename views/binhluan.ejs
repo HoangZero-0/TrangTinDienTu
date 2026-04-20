@@ -31,27 +31,35 @@
 						</tr>
 					</thead>
 					<tbody>
-						<% binhluan.forEach((bl, index) => { %>
+						<% if(binhluan.length === 0) { %>
 							<tr>
-								<td class="text-center align-middle"><%= index + 1 %></td>
-								<td class="align-middle"><%= bl.TaiKhoan.HoVaTen %></td>
-								<td class="align-middle"><a href="/baiviet/chitiet/<%= bl.BaiViet._id %>" target="_blank"><%= bl.BaiViet.TieuDe %></a></td>
-								<td class="align-middle"><%= bl.NoiDung %></td>
-								<td class="text-center align-middle">
-									<% if(bl.KiemDuyet === 1) { %>
-										<form action="/binhluan/duyet/<%= bl._id %>" method="POST" style="display:inline;"><button type="submit" class="btn btn-sm btn-link p-0"><span class="badge bg-success">Đang hiển thị</span></button></form>
-									<% } else { %>
-										<form action="/binhluan/duyet/<%= bl._id %>" method="POST" style="display:inline;"><button type="submit" class="btn btn-sm btn-link p-0"><span class="badge bg-secondary">Đang ẩn</span></button></form>
-									<% } %>
-								</td>
-								<td class="text-center align-middle"><%= new Date(bl.NgayBinhLuan).toLocaleDateString('vi-VN') %></td>
-								<td class="text-center align-middle">
-									<form action="/binhluan/xoa/<%= bl._id %>" method="POST" style="display:inline;" onsubmit="return confirm('Bạn có muốn xóa bình luận này không?');">
-										<button type="submit" class="btn btn-sm btn-link p-0 text-danger"><i class="bi bi-trash"></i></button>
-									</form>
-								</td>
+								<td colspan="7" class="text-center text-muted p-3">Chưa có bình luận nào.</td>
 							</tr>
-						<% }); %>
+						<% } else { %>
+							<% binhluan.forEach((bl, index) => { %>
+								<% if(bl.TaiKhoan && bl.BaiViet) { %>
+								<tr>
+									<td class="text-center align-middle"><%= index + 1 %></td>
+									<td class="align-middle"><%= bl.TaiKhoan.HoVaTen %></td>
+									<td class="align-middle"><a href="/baiviet/chitiet/<%= bl.BaiViet._id %>" target="_blank"><%= bl.BaiViet.TieuDe %></a></td>
+									<td class="align-middle text-truncate" style="max-width: 250px;"><%= bl.NoiDung %></td>
+									<td class="text-center align-middle">
+										<% if(bl.KiemDuyet === 1) { %>
+											<form action="/binhluan/duyet/<%= bl._id %>" method="POST" style="display:inline;"><button type="submit" class="btn btn-sm btn-link p-0" title="Ẩn bình luận"><span class="badge bg-success">Đang hiển thị</span></button></form>
+										<% } else { %>
+											<form action="/binhluan/duyet/<%= bl._id %>" method="POST" style="display:inline;"><button type="submit" class="btn btn-sm btn-link p-0" title="Duyệt hiển thị"><span class="badge bg-secondary">Đang ẩn</span></button></form>
+										<% } %>
+									</td>
+									<td class="text-center align-middle"><%= new Date(bl.NgayBinhLuan).toLocaleDateString('vi-VN') %></td>
+									<td class="text-center align-middle">
+										<form action="/binhluan/xoa/<%= bl._id %>" method="POST" style="display:inline;" onsubmit="return confirm('Bạn có muốn xóa bình luận này không?');">
+											<button type="submit" class="btn btn-sm btn-link p-0 text-danger"><i class="bi bi-trash"></i></button>
+										</form>
+									</td>
+								</tr>
+								<% } %>
+							<% }); %>
+						<% } %>
 					</tbody>
 				</table>
 			</div>

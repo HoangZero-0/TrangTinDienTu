@@ -18,7 +18,7 @@
 		<div class="card mt-3">
 			<div class="card-header"><%= title %></div>
 			<div class="card-body">
-				<form action="/baiviet/sua/<%= baiviet._id %>" method="post" class="needs-validation" novalidate>
+				<form action="/baiviet/sua/<%= baiviet._id %><%= (typeof isAdminMode !== 'undefined' && isAdminMode) ? '?mode=admin' : '' %>" method="post" class="needs-validation" novalidate>
 					<div class="mb-3">
 						<label for="MaChuDe" class="form-label">Chủ đề</label>
 						<select class="form-select" id="MaChuDe" name="MaChuDe" required>
@@ -61,7 +61,7 @@
 	<script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
 	<script>
 		CKEDITOR.replace('NoiDung', {
-			customConfig: 'https://trangtin-v3-1.onrender.com/js/config.js',
+			customConfig: '/js/config.js',
 			filebrowserUploadUrl: '/upload',
 			filebrowserUploadMethod: 'xhr'
 		});

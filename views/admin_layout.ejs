@@ -1,0 +1,68 @@
+<%
+    // Helper to check if a menu item is active
+    const isActive = (path) => title === path ? 'active' : '';
+%>
+<div class="admin-wrapper">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="sidebar-brand text-info">
+            <a href="/" class="text-info text-decoration-none"><i class="bi bi-star"></i> iNews Admin</a>
+        </div>
+        <div class="nav flex-column mt-3">
+            <a href="/admin" class="nav-link <%= isActive('Bảng điều khiển') %>">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+            <a href="/chude" class="nav-link <%= isActive('Danh sách chủ đề') %>">
+                <i class="bi bi-card-checklist"></i> Chủ đề
+            </a>
+            <a href="/taikhoan" class="nav-link <%= isActive('Danh sách tài khoản') %>">
+                <i class="bi bi-people"></i> Tài khoản
+            </a>
+            <a href="/baiviet" class="nav-link <%= isActive('Danh sách bài viết') %>">
+                <i class="bi bi-file-earmark-richtext"></i> Bài viết
+            </a>
+            <a href="/binhluan" class="nav-link <%= isActive('Danh sách bình luận') %>">
+                <i class="bi bi-chat-dots"></i> Bình luận
+            </a>
+            <div class="mt-auto mb-4 px-4">
+                <hr class="text-secondary">
+                <a href="/dangxuat" class="nav-link text-danger">
+                    <i class="bi bi-box-arrow-right"></i> Thoát
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="admin-main">
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-link d-lg-none p-0 me-3" id="sidebarToggle">
+                    <i class="bi bi-list fs-3"></i>
+                </button>
+                <h5 class="mb-0 fw-bold"><%= title %></h5>
+            </div>
+            <div class="admin-user-nav d-flex align-items-center">
+                <span class="me-3 d-none d-md-inline small text-muted">Xin chào, <strong><%= session.HoVaTen %></strong></span>
+                <img src="<%= session.HinhAnh || 'https://trangtin-v3-1.onrender.com/images/avatars/1.png' %>" class="img-avatar-nav rounded-circle shadow-sm" alt="admin">
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="admin-content">
+            <%- body %>
+        </div>
+
+        <footer class="admin-footer text-center py-3 bg-white border-top mt-auto small text-muted">
+            &copy; 2026 <strong>iNews Admin Dashboard</strong>. Design with <i class="bi bi-heart-fill text-danger"></i>
+        </footer>
+    </div>
+</div>
+
+<script>
+    // Simple Sidebar Toggle for Mobile
+    document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+        document.getElementById('adminSidebar').classList.toggle('show');
+    });
+</script>

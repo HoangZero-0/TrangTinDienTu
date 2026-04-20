@@ -93,7 +93,7 @@ router.get('/baiviet/chitiet/:id', async (req, res) => {
 
 	if (!bv) {
 		req.session.error = 'Bài viết không tồn tại.';
-		return res.redirect('/error');
+		return res.redirect('/');
 	}
 
 	// Chặn xem bài chưa duyệt nếu không phải Admin hoặc Tác giả
@@ -101,7 +101,7 @@ router.get('/baiviet/chitiet/:id', async (req, res) => {
 		if (req.session.QuyenHan !== 'admin' && (!req.session.MaNguoiDung || bv.TaiKhoan._id.toString() !== req.session.MaNguoiDung)) {
 			// Bài viết chưa duyệt, ẩn đi với độc giả thường
 			req.session.error = 'Bài viết này đang chờ Ban biên tập kiểm duyệt.';
-			return res.redirect('/error');
+			return res.redirect('/');
 		}
 	}
 
@@ -153,6 +153,7 @@ router.get('/baiviet/chitiet/:id', async (req, res) => {
 	}
 
 	res.render('baiviet_chitiet', {
+		title: bv.TieuDe,
 		chuyenmuc: cm,
 		baiviet: bv,
 		binhluan: rootComments,
@@ -174,7 +175,6 @@ router.post('/binhluan/:id', isAuth, async (req, res) => {
 	if (req.body.BinhLuanCha) data.BinhLuanCha = req.body.BinhLuanCha;
 	
 	await BinhLuan.create(data);
-	req.session.success = 'Gửi bình luận thành công.';
 	res.redirect('/baiviet/chitiet/' + id);
 });
 
@@ -196,7 +196,6 @@ router.post('/baiviet/luu/:id', isAuth, async (req, res) => {
 	}
 	
 	await user.save();
-	req.session.success = (index === -1 ? 'Đã lưu' : 'Đã bỏ lưu') + ' bài viết thành công.';
 	res.redirect(req.get('Referrer') || '/baiviet/chitiet/' + id);
 });
 
@@ -217,6 +216,9 @@ router.get('/baiviet/daluu', isAuth, async (req, res) => {
 	}).exec();
 
 	var allPosts = user ? user.BaiVietDaLuu : [];
+	// Lọc bỏ bài viết bị null (mồ côi) trước khi xử lý tiếp
+	allPosts = allPosts.filter(p => p !== null);
+	
 	// Đảo ngược mảng để bài mới lưu hiện lên đầu
 	allPosts.sort((a, b) => b._id.getTimestamp() - a._id.getTimestamp());
 
@@ -254,52 +256,47 @@ router.get('/chinhsach', async (req, res) => {
 	});
 });
 
-// GET: Tin mới nhất
-router.get('/tinmoi', async (req, res) => {
-	var perPage = 12;
-	var page = req.query.page || 1;
 
-	// Lấy chuyên mục hiển thị vào menu
-	var cm = await ChuDe.find();
-
-	var bv = await BaiViet.find({ KiemDuyet: 1 })
-		.sort({ NgayDang: -1 })
-		.populate('ChuDe')
-		.populate('TaiKhoan')
-		.skip((perPage * page) - perPage)
-		.limit(perPage).exec();
-		
-	var count = await BaiViet.countDocuments({ KiemDuyet: 1 });
-	var pages = Math.ceil(count / perPage);
-
-	res.render('tinmoinhat', {
-		title: 'Tin mới nhất',
-		chuyenmuc: cm,
-		baiviet: bv,
-		current: page,
-		pages: pages,
-		firstImage: firstImage
-	});
-});
 
 // GET: Kết quả tìm kiếm
 router.get('/timkiem', async (req, res) => {
 	var tukhoa = req.query.tukhoa;
-	
+	var perPage = 10;
+	var page = req.query.page || 1;
+
 	// Escape ký tự đặc biệt regex để chống ReDoS
-	var escapedTukhoa = tukhoa.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	var escapedTukhoa = tukhoa ? tukhoa.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') : '';
 	
-	// Xử lý tìm kiếm bài viết
-	var bv = await BaiViet.find({ KiemDuyet: 1, TieuDe: new RegExp(escapedTukhoa, 'i') })
+	// Điều kiện tìm kiếm
+	var filter = {
+		KiemDuyet: 1,
+		$or: [
+			{ TieuDe: new RegExp(escapedTukhoa, 'i') },
+			{ TomTat: new RegExp(escapedTukhoa, 'i') }
+		]
+	};
+
+	// Xử lý tìm kiếm bài viết (Phân trang)
+	var bv = await BaiViet.find(filter)
 		.populate('ChuDe')
 		.populate('TaiKhoan')
+		.sort({ NgayDang: -1 })
+		.skip((perPage * page) - perPage)
+		.limit(perPage)
 		.exec();
 	
+	var count = await BaiViet.countDocuments(filter);
+	var pages = Math.ceil(count / perPage);
+	var cm = await ChuDe.find();
+
 	// Render view timkiem.ejs
 	res.render('timkiem', {
 		title: 'Kết quả tìm kiếm',
+		chuyenmuc: cm,
 		baiviet: bv,
 		tukhoa: tukhoa,
+		current: page,
+		pages: pages,
 		firstImage: firstImage
 	});
 });
@@ -310,20 +307,6 @@ router.post('/upload', isAuth, upload.single('upload'), async (req, res) => {
 		uploaded: 1,
 		fileName: req.file.filename,
 		url: '/images/uploads/' + req.file.filename
-	});
-});
-
-// GET: Lỗi
-router.get('/error', async (req, res) => {
-	res.render('error', {
-		title: 'Lỗi'
-	});
-});
-
-// GET: Thành công
-router.get('/success', async (req, res) => {
-	res.render('success', {
-		title: 'Hoàn thành'
 	});
 });
 

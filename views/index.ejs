@@ -24,26 +24,25 @@
 						<% if(typeof baiviet !=="undefined" ) { %>
 							<% baiviet.forEach(bv=> { %>
 								<div class="col-md-4 mb-4">
-									<article class="card h-100">
-										<header class="card-header">
-											<div class="card-meta">
-												<a href="#"><time class="timeago"
-														datetime="<%= bv.NgayDang %>"></time></a> thuộc <a
-													href="/baiviet/chude/<%= bv.ChuDe ? bv.ChuDe._id : '#' %>">
-													<%= bv.ChuDe ? bv.ChuDe.TenChuDe : 'Chưa phân loại' %>
-												</a>
-											</div>
-											<a href="/baiviet/chitiet/<%= bv._id %>">
-												<h4 class="card-title card-title-limit">
-													<%= bv.TieuDe %>
-												</h4>
-											</a>
-										</header>
+									<article class="card h-100 border-0 shadow-sm">
 										<a href="/baiviet/chitiet/<%= bv._id %>">
 											<img class="card-img-post w-100" src="<%- firstImage(bv.NoiDung) %>" alt="" />
 										</a>
 										<div class="card-body">
-											<p class="card-text card-text-limit">
+											<a href="/baiviet/chitiet/<%= bv._id %>" class="text-decoration-none text-dark">
+												<h4 class="card-title">
+													<%= bv.TieuDe %>
+												</h4>
+											</a>
+											<div class="card-meta small mb-2 text-muted">
+												<time class="timeago" datetime="<%= bv.NgayDang %>"></time> thuộc 
+												<% if(bv.ChuDe) { %>
+													<a href="/baiviet/chude/<%= bv.ChuDe._id %>"><%= bv.ChuDe.TenChuDe %></a>
+												<% } else { %>
+													<span>Chưa phân loại</span>
+												<% } %>
+											</div>
+											<p class="card-text card-text-limit" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
 												<%= bv.TomTat %>
 											</p>
 										</div>

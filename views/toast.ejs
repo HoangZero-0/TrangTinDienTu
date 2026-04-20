@@ -1,0 +1,36 @@
+<!-- Toast thông báo -->
+<div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 9999;">
+	<% if(typeof toastSuccess !== "undefined" && toastSuccess) { %>
+		<div class="toast align-items-center text-bg-success border-0" role="alert" data-bs-autohide="true" data-bs-delay="4000">
+			<div class="d-flex">
+				<div class="toast-body">
+					<i class="bi bi-check-circle-fill me-2"></i><%= toastSuccess %>
+				</div>
+				<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+			</div>
+		</div>
+	<% } %>
+	<% if(typeof toastError !== "undefined" && toastError) { %>
+		<div class="toast align-items-center text-bg-danger border-0" role="alert" data-bs-autohide="true" data-bs-delay="4000">
+			<div class="d-flex">
+				<div class="toast-body">
+					<i class="bi bi-exclamation-triangle-fill me-2"></i><%= toastError %>
+				</div>
+				<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+			</div>
+		</div>
+	<% } %>
+</div>
+<% if((typeof toastSuccess !== "undefined" && toastSuccess) || (typeof toastError !== "undefined" && toastError)) { %>
+<script>
+	document.addEventListener('DOMContentLoaded', function() {
+		if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
+			var toasts = document.querySelectorAll('.toast');
+			toasts.forEach(function(el) {
+				var toast = new bootstrap.Toast(el);
+				toast.show();
+			});
+		}
+	});
+</script>
+<% } %>

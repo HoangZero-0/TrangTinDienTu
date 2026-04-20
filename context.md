@@ -24,6 +24,7 @@
     navbar_public.ejs   # Navbar trang public (partial dùng chung 7 trang)
     footer.ejs          # Footer trang admin
     footer_public.ejs   # Footer trang public (partial dùng chung 7 trang)
+    toast.ejs           # Component thông báo Toast (Bootstrap 5)
   /public           # Tài nguyên tĩnh (CSS, JS, Images)
     /css/app.css        # Bootstrap 5.1.3 minified + CSS custom + Sticky Footer (Flexbox)
     /js/app.js          # JS chung (timeago, Bootstrap bundle)
@@ -38,98 +39,52 @@
 - **Naming Convention:**
   - Models: PascalCase (e.g., `TaiKhoan`, `BaiViet`).
   - Biến/Hàm: camelCase hoặc Tiếng Việt không dấu tùy ngữ cảnh cũ.
-- **Error Handling:** Global Error Handler (Express 5 auto-catch async errors) + try/catch cho các thao tác database quan trọng. Thông báo lỗi qua `req.session.error`, thành công qua `req.session.success`. Đặc biệt: Xử lý lỗi `LIMIT_FILE_SIZE` của Multer tập trung tại `index.js`.
+- **Error Handling:** Global Error Handler (Express 5 auto-catch async errors) + try/catch cho các thao tác database quan trọng. Thông báo lỗi qua `req.session.error`, thành công qua `req.session.success`, hiển thị tức thì qua hệ thống **Bootstrap Toast**. Đặc biệt: Xử lý lỗi `LIMIT_FILE_SIZE` (10MB) của Multer tập trung tại `index.js`, trả về JSON cho CKEDITOR `/upload`.
 - **Security:**
   - Mã hóa mật khẩu bằng bcrypt.
   - Middleware `isAuth` và `isAdmin` bảo vệ route nhạy cảm.
-  - Chống IDOR: kiểm tra sở hữu bài viết trước khi sửa/xóa.
+  - Chống IDOR: kiểm tra sở hữu bài viết trước khi sửa/xóa. **Tác giả chỉ được sửa bài khi chưa duyệt.** Admin có quyền `?mode=admin` để ghi đè.
   - Chống ReDoS: escape regex trước khi dùng `RegExp` cho tìm kiếm.
-  - HTTP Method Safety: các route xóa/duyệt dùng POST (không phải GET).
-  - MongoDB URI lưu trong `.env` (dotenv), `.gitignore` đã cấu hình.
-  - Kiểm tra xác nhận mật khẩu khi đăng ký.
+  - HTTP Method Safety: các route xóa/duyệt dùng POST.
 
 # 5. NGHIỆP VỤ & THỰC THỂ CHÍNH (DOMAIN & CORE ENTITIES)
 
 - **Các Model cốt lõi:**
   - `TaiKhoan`: HoVaTen, Email, HinhAnh, TenDangNhap (unique), MatKhau (bcrypt hashed), QuyenHan (user/admin), KichHoat (0/1), BaiVietDaLuu (array of refs).
-  - `ChuDe`: TenChuDe (unique, required). Không thể xóa nếu còn bài viết liên quan.
-  - `BaiViet`: ChuDe (ref), TaiKhoan (ref), TieuDe, TomTat, NoiDung, NgayDang, LuotXem, KiemDuyet (0/1).
-  - `BinhLuan`: BaiViet (ref), TaiKhoan (ref), NoiDung, NgayBinhLuan, KiemDuyet (0/1), BinhLuanCha (ref - dùng cho trả lời bình luận).
+  - `ChuDe`: TenChuDe (unique, required). **Chặn xóa nếu còn bài viết liên quan.**
+  - `BaiViet`: ChuDe (ref), TaiKhoan (ref), TieuDe, TomTat, NoiDung, NgayDang, LuotXem, KiemDuyet (0/1). **Xóa bài tự động dọn dẹp bình luận và bookmark.**
+  - `BinhLuan`: BaiViet (ref), TaiKhoan (ref), NoiDung, NgayBinhLuan, KiemDuyet (0/1), BinhLuanCha (ref). **Xóa bình luận gốc tự động xóa toàn bộ phản hồi con.**
 
 # 6. LUỒNG HOẠT ĐỘNG CHÍNH (CORE FLOWS)
 
 ## Flow 1: Đăng ký & Đăng nhập
 
-- **Đăng ký:** Upload ảnh đại diện (multer), kiểm tra mật khẩu xác nhận, hash bcrypt, kiểm tra trùng TenDangNhap (unique index).
-- **Đăng nhập:** Xác thực bcrypt, kiểm tra tài khoản bị khóa (KichHoat=0), lưu session (MaNguoiDung, HoVaTen, QuyenHan).
-- **Đăng xuất:** Xóa session MaNguoiDung, HoVaTen, QuyenHan.
-- **Files:** `routers/auth.js`, `views/dangky.ejs`, `views/dangnhap.ejs`.
+- **Đăng ký:** Upload ảnh đại diện (multer), kiểm tra mật khẩu xác nhận, hash bcrypt, kiểm tra trùng TenDangNhap + trùng Email.
+- **Tài khoản mồ côi:** Khi xóa tài khoản, tất cả bài viết/bình luận của họ được **Chuyển nhượng (Reassign)** về cho Admin thực hiện lệnh xóa để bảo toàn dữ liệu trang web.
 
 ## Flow 2: Quản lý bài viết (Tác giả)
 
-- Đăng bài (chọn chủ đề, nhập tiêu đề/tóm tắt/nội dung CKEditor) → trạng thái chờ duyệt (KiemDuyet: 0).
-- Sửa/Xóa bài viết của chính mình (kiểm tra IDOR).
-- Xem danh sách "Bài viết của tôi".
-- **Files:** `routers/baiviet.js`, `views/baiviet_them.ejs`, `views/baiviet_sua.ejs`, `views/baiviet_cuatoi.ejs`.
+- Đăng bài → chờ duyệt. Sửa bài: Chỉ được phép sửa khi bài ở trạng thái chờ duyệt. Một khi bài đã đăng công khai, chỉ Admin mới có quyền sửa đổi.
+- **Media:** Dung lượng tải lên tối đa **10MB**. Ảnh trong bài viết tự động thích ứng (Responsive) 100% chiều rộng khung.
 
 ## Flow 3: Kiểm duyệt & Quản trị (Admin)
 
-- Dashboard: thống kê số lượng chủ đề, bài viết, tài khoản.
-- Duyệt/bỏ duyệt bài viết và bình luận (toggle KiemDuyet, POST method).
-- CRUD chủ đề (kiểm tra bài viết liên quan trước khi xóa).
-- CRUD tài khoản (khóa/mở, đổi quyền, xóa ảnh cũ khi upload mới).
-- Xóa bài viết/bình luận (POST method, có confirm dialog).
-- **Files:** `routers/baiviet.js`, `routers/binhluan.js`, `routers/chude.js`, `routers/taikhoan.js`, `routers/auth.js`.
-
-## Flow 4: Hiển thị & Tương tác (Độc giả)
-
-- **Trang chủ:** Tin mới nhất (phân trang 12 bài/trang), sidebar "Xem nhiều nhất" + "Thẻ chuyên mục".
-- **Chi tiết bài viết:** Tăng lượt xem (session-based, tránh spam). Chặn xem bài chưa duyệt trừ admin/tác giả. Hiển thị 4 bài viết liên quan (cùng chủ đề). Cho phép lưu bài viết (Bookmark).
-- **Bình luận:** Yêu cầu đăng nhập. Hỗ trợ bình luận hai cấp (gốc và trả lời). Phản hồi kế thừa trạng thái kiểm duyệt.
-- **Bài viết đã lưu:** Xem danh sách bài viết độc giả đã lưu (route `/baiviet/daluu`, yêu cầu đăng nhập).
-- **Tìm kiếm:** Escape regex chống ReDoS, hiển thị kết quả dạng card.
-- **Chuyên mục:** Xem bài theo chủ đề, dropdown menu navbar.
-- **Tin mới nhất:** API `/tinmoi`, hiển thị 50 bài mới nhất.
-- **Trang tĩnh:** Liên hệ, Chính sách riêng tư.
-- **Upload ảnh:** CKEditor upload qua `/upload` (multer).
-- **Files:** `routers/index.js`, `views/index.ejs`, `views/baiviet_chitiet.ejs`, `views/baiviet_daluu.ejs`, `views/baiviet_chude.ejs`, `views/timkiem.ejs`, `views/tinmoinhat.ejs`, `views/lienhe.ejs`, `views/chinhsach.ejs`.
-
-## Flow 5: Hồ sơ cá nhân
-
-- Người dùng cập nhật HoVaTen, Email, HinhAnh, MatKhau. Giới hạn ảnh tối đa 2MB.
-- Xóa ảnh cũ khi upload ảnh mới. Định dạng hiển thị đồng bộ qua class `.img-thumbnail-account` (100x100px, circle).
-- **Files:** `routers/taikhoan.js` (GET/POST /hoso), `views/taikhoan_hoso.ejs`.
+- Quản lý toàn bộ danh sách Bài viết, Chủ đề, Tài khoản, Bình luận.
+- Chế độ ghi đè: Sử dụng query parameter `?mode=admin` để chỉnh sửa mọi bài viết bất kể tình trạng kiểm duyệt.
+- Quản lý giao diện: Phân trang tìm kiếm, thumbnails tài khoản, placeholder khi danh sách trống.
 
 # 7. TRẠNG THÁI DỰ ÁN & BACKLOG (STATE & TODO)
 
 ## Hoàn thành (Done)
 
-- [x] Cấu trúc Model và Database.
-- [x] Hệ thống Đăng ký/Đăng nhập/Phân quyền.
-- [x] Chức năng Đăng bài và Quản lý bài viết cá nhân.
-- [x] Chức năng Quản lý (Admin): Duyệt bài, Chủ đề, Tài khoản.
-- [x] Giao diện hiển thị, Tìm kiếm, Bình luận.
-- [x] Loại bỏ phần Instagram trên giao diện người dùng.
-- [x] Triển khai trang Liên hệ và Chính sách riêng tư.
-- [x] Fix Bug: `require` → `required` trong ChuDe model.
-- [x] Fix Bug: Regex firstImage khớp cả `<img>` và `<img/>`.
-- [x] Fix Bug: Input HinhAnh đăng ký đổi sang `type="file"`.
-- [x] Fix Bug: Kiểm tra xác nhận mật khẩu khi đăng ký.
-- [x] Bảo mật: Escape regex chống ReDoS trong tìm kiếm.
-- [x] Bảo mật: Đổi GET → POST cho route xóa/duyệt (4 routers + 5 views).
-- [x] Bảo mật: MongoDB URI → `.env` + dotenv + `.gitignore`.
-- [x] Logic: Kiểm tra bài viết liên quan trước khi xóa chủ đề.
-- [x] Logic: Global Error Handler (Express 5 async error handling).
-- [x] Logic: Null-safe check cho `bv.ChuDe` trong 7 views (phòng bài viết mồ côi).
-- [x] UI: Xóa newsletter giả khỏi 4 trang public.
-- [x] Kiến trúc: Tách navbar public thành `navbar_public.ejs` (7 trang dùng chung).
-- [x] Kiến trúc: Tách footer public thành `footer_public.ejs` (7 trang dùng chung).
-- [x] UI: Đổi footer từ bg-dark sang tone #2c3e50 (navy đậm).
-- [x] Tính năng: Trả lời bình luận (threaded comments) và Bài viết liên quan (related posts).
-- [x] Tính năng: Lưu bài viết (Bookmark) + view `baiviet_daluu.ejs` + link navbar "Đã lưu".
-- [x] UI: Sticky Footer (Flexbox) đảm bảo footer luôn ở dưới cùng trang.
-- [x] Bảo mật & UI: Giới hạn upload ảnh 2MB (Multer) + Hiển thị ảnh đại diện đồng bộ (`.img-thumbnail-account`).
-- [x] Giao diện: Thêm `accept="image/*"` cho tất cả các input file chọn ảnh.
+- [x] Hệ thống toàn vẹn dữ liệu (Cascade Delete & Reassignment).
+- [x] Cơ chế bảo vệ Safety Shield cho Views.
+- [x] Chính sách chỉnh sửa nội dung bảo mật (Author Policy).
+- [x] Nâng cấp Media: Upload 10MB + Image Responsive.
+- [x] Phân trang trang chủ, trang đã lưu, trang tìm kiếm.
+- [x] Hệ thống Toast thông báo tập trung.
+- [x] Audit toàn bộ hệ thống & Fix code nhân danh tính chuyên nghiệp.
+- [x] Việt hóa 100% giao tiếp và hướng dẫn.
 
 ## Đang tiến hành (In Progress)
 
@@ -137,4 +92,4 @@
 
 ## Cần làm (TODO/Backlog)
 
-- [ ] (Trống)
+- [x] Bàn giao hệ thống và đồng bộ tài liệu (Done).

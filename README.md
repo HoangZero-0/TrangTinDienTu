@@ -1,6 +1,6 @@
-# 📰 TrangTin — Trang Tin Điện Tử
+# 📰 TrangTin — Trang Tin Điện Tử (CMS Pro)
 
-Website trang tin tức cho phép người dùng đăng bài viết, bình luận và quản trị viên kiểm duyệt nội dung. Xây dựng trên nền tảng Node.js với kiến trúc MVC.
+Website trang tin tức chuyên nghiệp cho phép người dùng đăng bài viết, bình luận và quản trị viên kiểm duyệt nội dung. Hệ thống được thiết kế với sự chú trọng đặc biệt vào **Toàn vẹn dữ liệu (Data Integrity)** và **Trải nghiệm người dùng (UX)**.
 
 ## 🚀 Công nghệ sử dụng
 
@@ -10,105 +10,64 @@ Website trang tin tức cho phép người dùng đăng bài viết, bình luậ
 | **Database**        | MongoDB Atlas, Mongoose                          |
 | **Template Engine** | EJS                                              |
 | **Authentication**  | bcryptjs, express-session, connect-mongo         |
-| **Upload**          | Multer                                           |
+| **Upload**          | Multer (Hỗ trợ tối đa 10MB)                      |
 | **Soạn thảo**       | CKEditor 4                                       |
 | **Frontend**        | Bootstrap 5, CSS custom, Sticky Footer (Flexbox) |
-| **Env**             | dotenv                                           |
+| **Thông báo**       | Bootstrap Toast (Real-time Feedback)             |
 
 ## 📁 Cấu trúc dự án
 
-```
-├── index.js            # Điểm khởi đầu ứng dụng
-├── .env                # Biến môi trường (MONGO_URI) — không push lên Git
+```text
+├── index.js            # Điểm khởi đầu ứng dụng (Global Error Handler)
+├── .env                # Biến môi trường (MONGO_URI)
 ├── models/             # Schema MongoDB (TaiKhoan, ChuDe, BaiViet, BinhLuan)
 ├── routers/            # Route handlers (auth, baiviet, binhluan, chude, taikhoan, index)
 ├── modules/            # Middleware & utilities (auth check, upload, firstimage)
 ├── views/              # Giao diện EJS (pages + partials)
-│   ├── navbar_public.ejs   # Navbar public (dùng chung)
-│   ├── footer_public.ejs   # Footer public (dùng chung)
-│   ├── navbar.ejs          # Navbar admin
-│   └── ...                 # Các trang view
+│   ├── navbar_public.ejs   # Navbar public (Bộ lọc safety shield)
+│   ├── footer_public.ejs   # Footer public (Sticky footer)
+│   ├── toast.ejs           # Component thông báo tập trung
+│   └── ...                 # Các quản trị & người dùng
 └── public/             # Tài nguyên tĩnh (CSS, JS, Images)
 ```
 
-## ✨ Tính năng chính
+## ✨ Tính năng nổi bật (v3.0)
 
-### Người dùng (User)
+### 💎 Toàn vẹn dữ liệu & Tối ưu quản trị
 
-- Đăng ký tài khoản (có upload ảnh đại diện)
-- Đăng nhập / Đăng xuất
-- Đăng bài viết (soạn thảo CKEditor, chờ admin duyệt)
-- Sửa / Xóa bài viết của mình
-- Gửi bình luận (sau khi đăng nhập)
-- Trả lời bình luận (threaded comments — hỗ trợ 2 cấp: gốc và phản hồi)
-- Lưu bài viết yêu thích (Bookmark) và xem lại danh sách đã lưu
-- Cập nhật hồ sơ cá nhân
+- **Xóa liên hoàn (Cascade Delete):** Khi xóa bài viết, hệ thống tự động dọn dẹp bình luận và gỡ bookmark của tất cả người dùng liên quan.
+- **Chuyển nhượng tài khoản (Data Reassignment):** Khi xóa một tài khoản, toàn bộ bài viết và bình luận của họ được tự động chuyển về cho Admin thực hiện hành động, giúp đảm bảo trang tin không bao giờ bị mất dữ liệu mồ côi.
+- **Cơ chế Safety Shield:** Toàn bộ Views được bảo vệ bởi logic kiểm tra dữ liệu null-safe, ngăn chặn hoàn toàn lỗi sập trang (Crash) từ dữ liệu lỗi.
+- **Trạng thái Placeholder:** Hiển thị thông báo "Danh sách trống" trực quan cho tất cả các bảng quản trị (Admin Tables).
 
-### Quản trị viên (Admin)
+### 📝 Trải nghiệm người viết & Độc giả
 
-- Dashboard thống kê (chủ đề, bài viết, tài khoản)
-- Duyệt / Bỏ duyệt bài viết và bình luận
-- CRUD chủ đề (kiểm tra bài viết liên quan trước khi xóa)
-- CRUD tài khoản (khóa / mở, đổi quyền)
+- **Chính sách Bài viết (Author Policy):** Tác giả chỉ được chỉnh sửa bài viết khi chưa duyệt. Sau khi đăng công khai, bản quyền thuộc về Ban biên tập. Admin có chế độ `mode=admin` để ghi đè.
+- **Media Optimization:** Hỗ trợ upload ảnh lên đến **10MB**. Ảnh trong nội dung tự động tương thích (Responsive) 100% chiều rộng khung kèm đổ bóng cao cấp.
+- **Tìm kiếm v2:** Tìm kiếm bài viết có hỗ trợ phân trang (Pagination), tối ưu cho cơ sở dữ liệu lớn.
+- **Bình luận đa cấp:** Hỗ trợ trả lời (Reply) 2 cấp, xóa bình luận gốc sẽ xóa toàn bộ phản hồi con.
 
-### Độc giả (Guest)
+## 🔒 Bảo mật hệ thống
 
-- Xem trang chủ (phân trang 12 bài/trang, sidebar xem nhiều nhất + thẻ chuyên mục)
-- Xem chi tiết bài viết (đếm lượt xem session-based, chống spam view)
-- Xem 4 bài viết liên quan (cùng chuyên mục) ở cuối bài
-- Tìm kiếm bài viết
-- Xem bài theo chuyên mục (dropdown menu)
-- Xem 50 tin mới nhất (`/tinmoi`)
-- Trang Liên hệ, Chính sách riêng tư
-
-## 🔒 Bảo mật
-
-- Mã hóa mật khẩu bằng **bcrypt**
-- Middleware phân quyền (`isAuth`, `isAdmin`)
-- Chống **IDOR** (kiểm tra sở hữu bài viết)
-- Chống **ReDoS** (escape regex tìm kiếm)
-- **HTTP Method Safety** (xóa/duyệt dùng POST)
-- MongoDB URI lưu trong `.env` (không hardcode)
+- Mã hóa mật khẩu bằng **bcrypt**.
+- Middleware bảo vệ đa tầng (`isAuth`, `isAdmin`).
+- Hệ thống chặn **IDOR** (kiểm tra quyền sở hữu ID).
+- Chống **ReDoS** (escape regex người dùng nhập).
+- Toàn bộ hành động xóa/duyệt sử dụng **POST Method**.
 
 ## ⚙️ Hướng dẫn cài đặt
 
 ### Yêu cầu
 
 - Node.js (v14+)
-- MongoDB Atlas hoặc MongoDB local
+- MongoDB Atlas (SaaS)
 
 ### Các bước
 
-**1. Clone dự án**
-
-```bash
-git clone https://github.com/YOUR_USERNAME/TrangTinDienTu.git
-cd TrangTinDienTu
-```
-
-**2. Cài đặt dependencies**
-
-```bash
-npm install
-```
-
-**3. Tạo file `.env`**
-
-```env
-MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/trangtin
-```
-
-**4. Chạy ứng dụng**
-
-```bash
-# Development (auto-reload)
-npm run dev
-
-# Production
-npm start
-```
-
-Truy cập: `http://localhost:3000`
+1.  **Clone dự án:** `git clone ...`
+2.  **Cài đặt:** `npm install`
+3.  **Cấu hình:** Tạo file `.env` chứa `MONGO_URI`.
+4.  **Khởi động:** `npm run dev` (dành cho phát triển) hoặc `npm start` (dành cho vận hành).
 
 ## 👨‍💻 Tác giả
 
