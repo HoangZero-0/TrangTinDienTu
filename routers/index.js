@@ -202,18 +202,36 @@ router.post('/baiviet/luu/:id', isAuth, async (req, res) => {
 
 // GET: Danh sách bài viết đã lưu
 router.get('/baiviet/daluu', isAuth, async (req, res) => {
-	var cm = await ChuDe.find();
+	var perPage = 12;
+	var page = req.query.page || 1;
 	var userId = req.session.MaNguoiDung;
 	
+	// Lấy chuyên mục hiển thị vào menu
+	var cm = await ChuDe.find();
+	
+	// Lấy thông tin tài khoản và populate mảng bài viết đã lưu
+	// Lưu ý: Vì mảng BaiVietDaLuu có thể lớn, chúng ta populate và sau đó phân trang trên mảng kết quả
 	var user = await TaiKhoan.findById(userId).populate({
 		path: 'BaiVietDaLuu',
 		populate: { path: 'ChuDe' }
 	}).exec();
 
+	var allPosts = user ? user.BaiVietDaLuu : [];
+	// Đảo ngược mảng để bài mới lưu hiện lên đầu
+	allPosts.sort((a, b) => b._id.getTimestamp() - a._id.getTimestamp());
+
+	var count = allPosts.length;
+	var pages = Math.ceil(count / perPage);
+	
+	// Cắt mảng để lấy dữ liệu cho trang hiện tại
+	var bvPaginated = allPosts.slice((perPage * page) - perPage, perPage * page);
+
 	res.render('baiviet_daluu', {
 		title: 'Bài viết đã lưu',
 		chuyenmuc: cm,
-		baiviet: user ? user.BaiVietDaLuu : [],
+		baiviet: bvPaginated,
+		current: page,
+		pages: pages,
 		firstImage: firstImage
 	});
 });
@@ -238,15 +256,28 @@ router.get('/chinhsach', async (req, res) => {
 
 // GET: Tin mới nhất
 router.get('/tinmoi', async (req, res) => {
+	var perPage = 12;
+	var page = req.query.page || 1;
+
+	// Lấy chuyên mục hiển thị vào menu
+	var cm = await ChuDe.find();
+
 	var bv = await BaiViet.find({ KiemDuyet: 1 })
 		.sort({ NgayDang: -1 })
 		.populate('ChuDe')
 		.populate('TaiKhoan')
-		.limit(50).exec();
+		.skip((perPage * page) - perPage)
+		.limit(perPage).exec();
 		
+	var count = await BaiViet.countDocuments({ KiemDuyet: 1 });
+	var pages = Math.ceil(count / perPage);
+
 	res.render('tinmoinhat', {
 		title: 'Tin mới nhất',
+		chuyenmuc: cm,
 		baiviet: bv,
+		current: page,
+		pages: pages,
 		firstImage: firstImage
 	});
 });

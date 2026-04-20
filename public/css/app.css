@@ -116,3 +116,51 @@ footer.site-footer {
 	border-radius: 50%;
 	border: 2px solid #dee2e6;
 }
+
+/* Ảnh bài viết trong danh sách */
+.card-img-post {
+	height: 180px;
+	object-fit: cover;
+}
+
+/* Ảnh bài viết liên quan */
+.card-img-related {
+	height: 140px;
+	object-fit: cover;
+}
+
+/* Ảnh đại diện trong bình luận */
+.img-avatar-comment {
+	object-fit: cover;
+	border-radius: 50%;
+}
+
+/* Ảnh đại diện trên Navbar */
+.img-avatar-nav {
+	width: 30px;
+	height: 30px;
+	object-fit: cover;
+	border-radius: 50%;
+}
+
+/* Giới hạn dòng cho Tiêu đề (2 dòng) */
+.card-title-limit {
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 3rem; /* Đảm bảo chiều cao cố định cho 2 dòng */
+	line-height: 1.5rem;
+}
+
+/* Giới hạn dòng cho Tóm tắt (3 dòng) */
+.card-text-limit {
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 4.5rem; /* Đảm bảo chiều cao cố định cho 3 dòng */
+	line-height: 1.5rem;
+}

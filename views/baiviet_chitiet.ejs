@@ -66,7 +66,7 @@
 											<div class="col-md-3">
 												<div class="card mb-3 border-0 shadow-sm h-100">
 													<a href="/baiviet/chitiet/<%= lq._id %>">
-														<img class="card-img-top" src="<%- firstImage(lq.NoiDung) %>" style="height: 120px; object-fit: cover;" />
+														<img class="card-img-related w-100" src="<%- firstImage(lq.NoiDung) %>" />
 													</a>
 													<div class="p-2">
 														<h6 class="card-title mb-0" style="font-size: 0.9rem;">
@@ -93,7 +93,7 @@
 									<div class="mb-4">
 										<div class="d-flex p-3 bg-light rounded shadow-sm">
 											<div class="text-center">
-												<img class="me-3 rounded-circle border"
+												<img class="me-3 img-avatar-comment border"
 													src="<%= bl.TaiKhoan.HinhAnh || 'https://trangtin-v3-1.onrender.com/images/avatars/1.png' %>"
 													width="50" height="50" />
 											</div>
@@ -129,7 +129,7 @@
 												<% bl.replies.forEach(reply => { %>
 												<div class="d-flex mb-2 p-2 bg-white rounded border shadow-sm">
 													<div class="text-center">
-														<img class="me-2 rounded-circle border"
+														<img class="me-2 img-avatar-comment border"
 															src="<%= reply.TaiKhoan.HinhAnh || 'https://trangtin-v3-1.onrender.com/images/avatars/1.png' %>"
 															width="35" height="35" />
 													</div>
@@ -194,7 +194,7 @@
 										<h4 class="h6">
 											<%= bv.TieuDe %>
 										</h4>
-										<img class="card-img" src="<%- firstImage(bv.NoiDung) %>" alt="" />
+										<img class="card-img-post w-100" src="<%- firstImage(bv.NoiDung) %>" alt="" />
 									</a>
 									<time class="timeago" datetime="<%= bv.NgayDang %>"></time> thuộc <%=
 										bv.ChuDe ? bv.ChuDe.TenChuDe : 'Chưa phân loại' %>

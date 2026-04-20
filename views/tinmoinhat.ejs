@@ -3,51 +3,95 @@
 
 <head>
 	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
-	<title><%= title %> - Trang tin điện tử</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+	<meta name="description" content="Trang tin điện tử nhiều người xem nhất vũ trụ." />
+	<meta name="author" content="Nguyễn Hoàng Thức & Lê Nhật Quang" />
+	<title>
+		<%= title %> - Trang tin điện tử
+	</title>
+	<link href="/css/app.css" rel="stylesheet" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
 </head>
 
 <body>
-	<div class="container">
-		<!-- Menu ngang -->
-		<%- include('navbar') %>
-		
-		<!-- Nội dung chính -->
-		<div class="card mt-3">
-			<div class="card-header"><%= title %></div>
-			<div class="card-body">
-				<% if(typeof baiviet !== "undefined" && baiviet.length > 0) { %>
+	<%- include('navbar_public') %>
+	<main class="main pt-4">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-11 mx-auto">
+					<h2 class="mb-4"><%= title %></h2>
 					<div class="row">
-					<% baiviet.forEach(bv => { %>
-						<div class="col-md-4 mb-4">
-							<article class="card h-100">
-								<a href="/baiviet/chitiet/<%= bv._id %>">
-									<img class="card-img-top" src="<%- firstImage(bv.NoiDung) %>" alt="" />
-								</a>
-								<div class="card-body">
-									<a href="/baiviet/chitiet/<%= bv._id %>" class="text-decoration-none text-dark">
-										<h5 class="card-title"><%= bv.TieuDe %></h5>
-									</a>
-									<p class="card-text text-muted small"><i class="bi bi-clock"></i> <%= new Date(bv.NgayDang).toLocaleDateString('vi-VN') %></p>
-									<p class="card-text"><%= bv.TomTat %></p>
+						<% if(typeof baiviet !== "undefined" && baiviet.length > 0) { %>
+							<% baiviet.forEach(bv => { %>
+								<div class="col-md-4 mb-4">
+									<article class="card h-100 border-0 shadow-sm">
+										<a href="/baiviet/chitiet/<%= bv._id %>">
+											<img class="card-img-post w-100" src="<%- firstImage(bv.NoiDung) %>" alt="" />
+										</a>
+										<div class="card-body">
+											<div class="card-meta small mb-2">
+												<time class="timeago" datetime="<%= bv.NgayDang %>"></time> thuộc <a
+													href="/baiviet/chude/<%= bv.ChuDe ? bv.ChuDe._id : '#' %>">
+													<%= bv.ChuDe ? bv.ChuDe.TenChuDe : 'Chưa phân loại' %>
+												</a>
+											</div>
+											<a href="/baiviet/chitiet/<%= bv._id %>" class="text-decoration-none text-dark">
+												<h5 class="card-title card-title-limit"><%= bv.TieuDe %></h5>
+											</a>
+											<p class="card-text card-text-limit"><%= bv.TomTat %></p>
+										</div>
+									</article>
 								</div>
-							</article>
-						</div>
-					<% }); %>
+							<% }); %>
+						<% } else { %>
+							<div class="col-12 text-center mt-5">
+								<p class="text-muted">Không có thông tin bài viết mới.</p>
+							</div>
+						<% } %>
 					</div>
-				<% } else { %>
-					<p class="card-text">Không có thông tin.</p>
-				<% } %>
+
+					<nav class="mt-4">
+						<ul class="pagination justify-content-center">
+							<% if (pages > 0) { %>
+								<% if (current == 1) { %>
+									<li class="page-item disabled"><a class="page-link" href="#">Về trước</a></li>
+								<% } else { %>
+									<li class="page-item"><a class="page-link" href="/tinmoi?page=1">Đầu</a></li>
+									<li class="page-item"><a class="page-link" href="/tinmoi?page=<%= Number(current) - 1 %>">Về trước</a></li>
+								<% } %>
+								
+								<% var i = (Number(current) > 3 ? Number(current) - 2 : 1) %>
+								<% if (i !== 1) { %>
+									<li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+								<% } %>
+								
+								<% for (; i <= (Number(current) + 2) && i <= pages; i++) { %>
+									<% if (i == current) { %>
+										<li class="page-item active"><a class="page-link" href="#"><%= i %></a></li>
+									<% } else { %>
+										<li class="page-item"><a class="page-link" href="/tinmoi?page=<%= i %>"><%= i %></a></li>
+									<% } %>
+									<% if (i == Number(current) + 2 && i < pages) { %>
+										<li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+									<% } %>
+								<% } %>
+								
+								<% if (current == pages) { %>
+									<li class="page-item disabled"><a class="page-link" href="#">Về sau</a></li>
+								<% } else { %>
+									<li class="page-item"><a class="page-link" href="/tinmoi?page=<%= Number(current) + 1 %>">Về sau</a></li>
+									<li class="page-item"><a class="page-link" href="/tinmoi?page=<%= pages %>">Cuối</a></li>
+								<% } %>
+							<% } %>
+						</ul>
+					</nav>
+				</div>
 			</div>
 		</div>
-		
-		<!-- Footer -->
-		<%- include('footer') %>
-	</div>
-	
-	<%- include('javascript') %>
+	</main>
+	<%- include('footer_public') %>
+	<script src="/js/app.js"></script>
 	<script src="/js/weather.js"></script>
 </body>
 

@@ -29,11 +29,10 @@
 					</div>
 					<div class="row">
 						<% if(typeof baiviet !=="undefined" ) { %>
-							<% var chunkSize=4; for(var i=0; i < baiviet.length; i +=chunkSize) { var
-								chunk=baiviet.slice(i, i + chunkSize); %>
-								<div class="col-12">
-									<% chunk.forEach(bv=> { %>
-										<article class="card mb-4">
+							<div class="row">
+								<% baiviet.forEach(bv=> { %>
+									<div class="col-md-4">
+										<article class="card mb-4 h-100">
 											<header class="card-header">
 												<div class="card-meta">
 													<a href="#"><time class="timeago"
@@ -43,24 +42,24 @@
 													</a>
 												</div>
 												<a href="/baiviet/chitiet/<%= bv._id %>">
-													<h4 class="card-title">
+													<h4 class="card-title card-title-limit">
 														<%= bv.TieuDe %>
 													</h4>
 												</a>
 											</header>
 											<a href="/baiviet/chitiet/<%= bv._id %>">
-												<img class="card-img" src="<%- firstImage(bv.NoiDung) %>" alt="" />
+												<img class="card-img-post w-100" src="<%- firstImage(bv.NoiDung) %>" alt="" />
 											</a>
 											<div class="card-body">
-												<p class="card-text">
+												<p class="card-text card-text-limit">
 													<%= bv.TomTat %>
 												</p>
 											</div>
 										</article>
-										<% }); %>
-								</div>
-								<% } %>
-									<% } else { %>
+									</div>
+								<% }); %>
+							</div>
+						<% } else { %>
 										<div class="alert alert-primary" role="alert">
 											<h4 class="alert-heading">Rất tiếc!</h4>
 											<p>Không có bài viết nào trong chuyên mục này.</p>

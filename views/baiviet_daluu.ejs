@@ -30,16 +30,16 @@
 							</div>
 						<% } else { %>
 							<% baiviet.forEach(bv => { %>
-								<div class="col-md-3">
-									<article class="card mb-4 border-0 shadow-sm h-100">
+								<div class="col-md-3 mb-4">
+									<article class="card h-100 border-0 shadow-sm">
 										<a href="/baiviet/chitiet/<%= bv._id %>">
-											<img class="card-img-top" src="<%- firstImage(bv.NoiDung) %>" style="height: 150px; object-fit: cover;" />
+											<img class="card-img-post w-100" src="<%- firstImage(bv.NoiDung) %>" />
 										</a>
 										<div class="card-body p-3">
 											<div class="card-meta small mb-2">
 												<time class="timeago" datetime="<%= bv.NgayDang %>"></time>
 											</div>
-											<h5 class="card-title h6 mb-3">
+											<h5 class="card-title h6 mb-3 card-title-limit">
 												<a href="/baiviet/chitiet/<%= bv._id %>" class="text-decoration-none text-dark">
 													<%= bv.TieuDe %>
 												</a>
@@ -55,6 +55,42 @@
 							<% }); %>
 						<% } %>
 					</div>
+					
+					<nav class="mt-4">
+						<ul class="pagination justify-content-center">
+							<% if (pages > 0) { %>
+								<% if (current == 1) { %>
+									<li class="page-item disabled"><a class="page-link" href="#">Về trước</a></li>
+								<% } else { %>
+									<li class="page-item"><a class="page-link" href="/baiviet/daluu?page=1">Đầu</a></li>
+									<li class="page-item"><a class="page-link" href="/baiviet/daluu?page=<%= Number(current) - 1 %>">Về trước</a></li>
+								<% } %>
+								
+								<% var i = (Number(current) > 3 ? Number(current) - 2 : 1) %>
+								<% if (i !== 1) { %>
+									<li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+								<% } %>
+								
+								<% for (; i <= (Number(current) + 2) && i <= pages; i++) { %>
+									<% if (i == current) { %>
+										<li class="page-item active"><a class="page-link" href="#"><%= i %></a></li>
+									<% } else { %>
+										<li class="page-item"><a class="page-link" href="/baiviet/daluu?page=<%= i %>"><%= i %></a></li>
+									<% } %>
+									<% if (i == Number(current) + 2 && i < pages) { %>
+										<li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+									<% } %>
+								<% } %>
+								
+								<% if (current == pages) { %>
+									<li class="page-item disabled"><a class="page-link" href="#">Về sau</a></li>
+								<% } else { %>
+									<li class="page-item"><a class="page-link" href="/baiviet/daluu?page=<%= Number(current) + 1 %>">Về sau</a></li>
+									<li class="page-item"><a class="page-link" href="/baiviet/daluu?page=<%= pages %>">Cuối</a></li>
+								<% } %>
+							<% } %>
+						</ul>
+					</nav>
 				</div>
 			</div>
 		</div>
