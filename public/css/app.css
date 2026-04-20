@@ -107,3 +107,12 @@ main.main {
 footer.site-footer {
 	flex-shrink: 0;
 }
+
+/* Định dạng ảnh đại diện */
+.img-thumbnail-account {
+	width: 100px;
+	height: 100px;
+	object-fit: cover;
+	border-radius: 50%;
+	border: 2px solid #dee2e6;
+}

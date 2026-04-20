@@ -26,6 +26,7 @@ router.post('/them', isAdmin, async (req, res) => {
 		TenChuDe: req.body.TenChuDe
 	};
 	await ChuDe.create(data);
+	req.session.success = 'Đã thêm chủ đề thành công.';
 	res.redirect('/chude');
 });
 
@@ -46,6 +47,7 @@ router.post('/sua/:id', isAdmin, async (req, res) => {
 		TenChuDe: req.body.TenChuDe
 	};
 	await ChuDe.findByIdAndUpdate(id, data);
+	req.session.success = 'Đã cập nhật chủ đề thành công.';
 	res.redirect('/chude');
 });
 
@@ -61,6 +63,7 @@ router.post('/xoa/:id', isAdmin, async (req, res) => {
 	}
 	
 	await ChuDe.findByIdAndDelete(id);
+	req.session.success = 'Đã xóa chủ đề thành công.';
 	res.redirect('/chude');
 });
 

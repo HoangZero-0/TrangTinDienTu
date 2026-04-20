@@ -38,7 +38,7 @@
 - **Naming Convention:**
   - Models: PascalCase (e.g., `TaiKhoan`, `BaiViet`).
   - Biến/Hàm: camelCase hoặc Tiếng Việt không dấu tùy ngữ cảnh cũ.
-- **Error Handling:** Global Error Handler (Express 5 auto-catch async errors) + try/catch cho các thao tác database quan trọng. Thông báo lỗi qua `req.session.error`, thành công qua `req.session.success`.
+- **Error Handling:** Global Error Handler (Express 5 auto-catch async errors) + try/catch cho các thao tác database quan trọng. Thông báo lỗi qua `req.session.error`, thành công qua `req.session.success`. Đặc biệt: Xử lý lỗi `LIMIT_FILE_SIZE` của Multer tập trung tại `index.js`.
 - **Security:**
   - Mã hóa mật khẩu bằng bcrypt.
   - Middleware `isAuth` và `isAdmin` bảo vệ route nhạy cảm.
@@ -96,8 +96,8 @@
 
 ## Flow 5: Hồ sơ cá nhân
 
-- Người dùng cập nhật HoVaTen, Email, HinhAnh, MatKhau.
-- Xóa ảnh cũ khi upload ảnh mới.
+- Người dùng cập nhật HoVaTen, Email, HinhAnh, MatKhau. Giới hạn ảnh tối đa 2MB.
+- Xóa ảnh cũ khi upload ảnh mới. Định dạng hiển thị đồng bộ qua class `.img-thumbnail-account` (100x100px, circle).
 - **Files:** `routers/taikhoan.js` (GET/POST /hoso), `views/taikhoan_hoso.ejs`.
 
 # 7. TRẠNG THÁI DỰ ÁN & BACKLOG (STATE & TODO)
@@ -128,6 +128,8 @@
 - [x] Tính năng: Trả lời bình luận (threaded comments) và Bài viết liên quan (related posts).
 - [x] Tính năng: Lưu bài viết (Bookmark) + view `baiviet_daluu.ejs` + link navbar "Đã lưu".
 - [x] UI: Sticky Footer (Flexbox) đảm bảo footer luôn ở dưới cùng trang.
+- [x] Bảo mật & UI: Giới hạn upload ảnh 2MB (Multer) + Hiển thị ảnh đại diện đồng bộ (`.img-thumbnail-account`).
+- [x] Giao diện: Thêm `accept="image/*"` cho tất cả các input file chọn ảnh.
 
 ## Đang tiến hành (In Progress)
 

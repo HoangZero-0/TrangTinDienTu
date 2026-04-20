@@ -82,7 +82,7 @@ router.post('/sua/:id', isAuth, async (req, res) => {
 		NoiDung: req.body.NoiDung
 	};
 	await BaiViet.findByIdAndUpdate(id, data);
-	req.session.success = 'Đã cập nhật bài viết thành công và đang chờ kiểm duyệt.';
+	req.session.success = 'Đã cập nhật bài viết thành công.';
 	res.redirect('/success');
 });
 
@@ -99,6 +99,7 @@ router.post('/xoa/:id', isAuth, async (req, res) => {
 	}
 
 	await BaiViet.findByIdAndDelete(id);
+	req.session.success = 'Đã xóa bài viết thành công.';
 	
 	// Trở lại trang trước
 	res.redirect(req.get('Referrer') || '/');
@@ -109,7 +110,9 @@ router.post('/duyet/:id', isAdmin, async (req, res) => {
 	var id = req.params.id;
 	var bv = await BaiViet.findById(id);
 	if (bv) {
-		await BaiViet.findByIdAndUpdate(id, { 'KiemDuyet': 1 - bv.KiemDuyet });
+		var status = 1 - bv.KiemDuyet;
+		await BaiViet.findByIdAndUpdate(id, { 'KiemDuyet': status });
+		req.session.success = (status === 1 ? 'Đã duyệt' : 'Đã bỏ duyệt') + ' bài viết thành công.';
 	}
 	
 	// Trở lại trang trước

@@ -55,8 +55,7 @@ router.get('/dangnhap', async (req, res) => {
 // POST: Đăng nhập
 router.post('/dangnhap', async (req, res) => {
 	if(req.session.MaNguoiDung) {
-		req.session.error = 'Người dùng đã đăng nhập rồi.';
-		res.redirect('/error');
+		res.redirect('/');
 	} else {
 		var taikhoan = await TaiKhoan.findOne({ TenDangNhap: req.body.TenDangNhap }).exec();
 		if(taikhoan) {
@@ -90,12 +89,8 @@ router.get('/dangxuat', async (req, res) => {
 		delete req.session.MaNguoiDung;
 		delete req.session.HoVaTen;
 		delete req.session.QuyenHan;
-		
-		res.redirect('/');
-	} else {
-		req.session.error = 'Người dùng chưa đăng nhập.';
-		res.redirect('/error');
 	}
+	res.redirect('/');
 });
 
 // GET: Trang quản trị

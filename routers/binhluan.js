@@ -19,6 +19,7 @@ router.post('/duyet/:id', isAdmin, async (req, res) => {
 	if(bl) {
 		bl.KiemDuyet = bl.KiemDuyet === 1 ? 0 : 1;
 		await bl.save();
+		req.session.success = (bl.KiemDuyet === 1 ? 'Đã duyệt' : 'Đã bỏ duyệt') + ' bình luận thành công.';
 	}
 	res.redirect('/binhluan');
 });
@@ -27,6 +28,7 @@ router.post('/duyet/:id', isAdmin, async (req, res) => {
 router.post('/xoa/:id', isAdmin, async (req, res) => {
 	var id = req.params.id;
 	await BinhLuan.findByIdAndDelete(id);
+	req.session.success = 'Đã xóa bình luận thành công.';
 	res.redirect('/binhluan');
 });
 

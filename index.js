@@ -64,6 +64,10 @@ app.use('/binhluan', binhluanRouter);
 
 // Global Error Handler - Bắt tất cả lỗi từ async routes (Express 5)
 app.use((err, req, res, next) => {
+	if (err.code === 'LIMIT_FILE_SIZE') {
+		req.session.error = 'Dung lượng file quá lớn, tối đa cho phép là 2MB.';
+		return res.redirect(req.get('Referrer') || '/error');
+	}
 	console.error('[LỖI HỆ THỐNG]', err.message);
 	req.session.error = 'Đã xảy ra lỗi hệ thống, vui lòng thử lại.';
 	res.redirect('/error');

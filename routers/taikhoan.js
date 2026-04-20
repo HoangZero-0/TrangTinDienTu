@@ -33,6 +33,7 @@ router.post('/them', isAdmin, upload.single('HinhAnh'), async (req, res) => {
 	};
 	if(req.file) data.HinhAnh = '/images/uploads/' + req.file.filename;
 	await TaiKhoan.create(data);
+	req.session.success = 'Đã thêm tài khoản thành công.';
 	res.redirect('/taikhoan');
 });
 
@@ -70,6 +71,7 @@ router.post('/sua/:id', isAdmin, upload.single('HinhAnh'), async (req, res) => {
 	if(req.body.MatKhau)
 		data['MatKhau'] = bcrypt.hashSync(req.body.MatKhau, salt);
 	await TaiKhoan.findByIdAndUpdate(id, data);
+	req.session.success = 'Đã cập nhật tài khoản thành công.';
 	res.redirect('/taikhoan');
 });
 
@@ -84,6 +86,7 @@ router.post('/xoa/:id', isAdmin, async (req, res) => {
 		} catch(err) {}
 	}
 	await TaiKhoan.findByIdAndDelete(id);
+	req.session.success = 'Đã xóa tài khoản thành công.';
 	res.redirect('/taikhoan');
 });
 

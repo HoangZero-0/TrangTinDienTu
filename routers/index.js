@@ -174,6 +174,7 @@ router.post('/binhluan/:id', isAuth, async (req, res) => {
 	if (req.body.BinhLuanCha) data.BinhLuanCha = req.body.BinhLuanCha;
 	
 	await BinhLuan.create(data);
+	req.session.success = 'Gửi bình luận thành công.';
 	res.redirect('/baiviet/chitiet/' + id);
 });
 
@@ -195,6 +196,7 @@ router.post('/baiviet/luu/:id', isAuth, async (req, res) => {
 	}
 	
 	await user.save();
+	req.session.success = (index === -1 ? 'Đã lưu' : 'Đã bỏ lưu') + ' bài viết thành công.';
 	res.redirect(req.get('Referrer') || '/baiviet/chitiet/' + id);
 });
 
