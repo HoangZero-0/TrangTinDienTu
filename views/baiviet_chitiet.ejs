@@ -70,6 +70,15 @@
 									</strong></p>
 								<%- baiviet.NoiDung %>
 
+									<!-- Thêm thông tin người đăng, thời gian, lượt xem -->
+									<div class="text-start text-muted small mt-4 mb-2">
+										<strong><i class="bi bi-person"></i> <%= (baiviet.TaiKhoan && baiviet.TaiKhoan.HoVaTen) ? baiviet.TaiKhoan.HoVaTen : 'Ẩn danh' %></strong> 
+										<span class="mx-2">|</span> 
+										<i class="bi bi-clock"></i> <%= new Date(baiviet.NgayDang).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) %> 
+										<span class="mx-2">|</span> 
+										<i class="bi bi-eye"></i> <%= baiviet.LuotXem %> lượt xem
+									</div>
+
 									<!-- Bài viết liên quan -->
 									<% if(typeof baivietlienquan !== "undefined" && baivietlienquan.length > 0) { %>
 									<div class="mt-5">
