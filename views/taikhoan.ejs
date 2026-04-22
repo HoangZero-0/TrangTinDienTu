@@ -18,7 +18,14 @@
 		<div class="card mt-3">
 			<div class="card-header"><%= title %></div>
 			<div class="card-body table-responsive">
-				<a href="/taikhoan/them" class="btn btn-primary mb-2"><i class="bi bi-plus-lg"></i> Thêm mới</a>
+				<div class="row mb-2">
+					<div class="col-md-8">
+						<a href="/taikhoan/them" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Thêm mới</a>
+					</div>
+					<div class="col-md-4">
+						<input type="text" id="searchFilter" class="form-control" placeholder="Tìm kiếm tài khoản...">
+					</div>
+				</div>
 				<table class="table table-bordered table-hover table-sm mb-0">
 					<thead>
 						<tr>

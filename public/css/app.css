@@ -164,3 +164,18 @@ footer.site-footer {
 	height: 4.5rem; /* Đảm bảo chiều cao cố định cho 3 dòng */
 	line-height: 1.5rem;
 }
+
+/* Hỗ trợ Navbar cố định (fixed-top) */
+body {
+	padding-top: 115px; /* Tăng khoảng đệm để không bị 2 thanh che khuất */
+}
+
+.topbar-weather {
+	z-index: 1040;
+	background-color: #f7f9fa !important;
+}
+
+.navbar.fixed-top {
+	top: 40px; /* Đẩy Menu xuống dưới thanh thời tiết (cao ~40px) */
+	z-index: 1030;
+}

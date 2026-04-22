@@ -1,99 +1,102 @@
 # 📰 TrangTin — Trang Tin Điện Tử (CMS Pro)
 
-Website trang tin tức chuyên nghiệp cho phép người dùng đăng bài viết, bình luận và quản trị viên kiểm duyệt nội dung. Hệ thống được thiết kế với sự chú trọng đặc biệt vào **Toàn vẹn dữ liệu (Data Integrity)** và **Trải nghiệm người dùng (UX)**.
+Website trang tin tức chuyên nghiệp được xây dựng trên nền tảng **Node.js** và **MongoDB**, cho phép người dùng đăng bài, bình luận và quản trị viên kiểm duyệt nội dung. Hệ thống tập trung vào tính toàn vẹn dữ liệu, hiệu năng và trải nghiệm người dùng hiện đại.
 
-## 🚀 Công nghệ sử dụng
+---
 
-| Thành phần          | Công nghệ                                        |
-| ------------------- | ------------------------------------------------ |
-| **Backend**         | Node.js (v14+), Express.js 5.2.1                 |
-| **Database**        | MongoDB Atlas, Mongoose 9.2.4                    |
-| **Template Engine** | EJS 5.0.1                                        |
-| **Authentication**  | bcryptjs 3.0.3, express-session, connect-mongo   |
-| **Upload**          | Multer 2.1.1 (Hỗ trợ tối đa 10MB)                |
-| **Soạn thảo**       | CKEditor 4.22.1                                  |
-| **Frontend**        | Bootstrap 5, CSS custom, Sticky Footer (Flexbox) |
-| **Thông báo**       | Bootstrap Toast (Real-time Feedback)             |
+## 🚀 Công nghệ sử dụng (Tech Stack)
+
+| Thành phần    | Công nghệ                                       | Phiên bản         |
+| :------------ | :---------------------------------------------- | :---------------- |
+| **Backend**   | Node.js (Runtime) & Express.js (Framework)      | v14+ / 5.2.1      |
+| **Database**  | MongoDB Atlas (Cloud Database)                  | v9.2.4 (Mongoose) |
+| **Session**   | express-session & connect-mongo (Session Store) | 1.19.0 / 6.0.0    |
+| **Template**  | EJS (Embedded JavaScript)                       | 5.0.1             |
+| **Auth**      | bcryptjs (Mã hóa mật khẩu)                      | 3.0.3             |
+| **Upload**    | Multer (Xử lý tải lên file tối đa 10MB)         | 2.1.1             |
+| **Soạn thảo** | CKEditor 4 (Full Featured)                      | 4.22.1            |
+| **Frontend**  | Bootstrap 5, jQuery, Bootstrap Icons            | 5.3.3 / 3.7.1     |
+
+---
 
 ## 📁 Cấu trúc dự án
 
 ```text
-├── index.js              # Điểm khởi đầu (Express setup, DB, Session, Global Error Handler)
-├── .env                  # Biến môi trường (MONGO_URI)
-├── models/               # Schema MongoDB
-│   ├── taikhoan.js       # Tài khoản (HoVaTen, Email, HinhAnh, TenDangNhap, MatKhau, QuyenHan, KichHoat, BaiVietDaLuu)
-│   ├── baiviet.js        # Bài viết (ChuDe, TaiKhoan, TieuDe, TomTat, NoiDung, NgayDang, LuotXem, KiemDuyet)
-│   ├── binhluan.js       # Bình luận (BaiViet, TaiKhoan, NoiDung, NgayBinhLuan, KiemDuyet, BinhLuanCha)
-│   └── chude.js          # Chủ đề (TenChuDe)
-├── routers/              # Route handlers
-│   ├── auth.js           # Đăng ký, Đăng nhập, Đăng xuất, Dashboard
-│   ├── index.js          # Trang chủ, Chuyên mục, Chi tiết, Bình luận, Bookmark, Tìm kiếm, Upload
-│   ├── baiviet.js        # CRUD bài viết, Duyệt bài, Bài viết của tôi
-│   ├── chude.js          # CRUD chủ đề
-│   ├── taikhoan.js       # CRUD tài khoản, Hồ sơ cá nhân
-│   └── binhluan.js       # Quản lý bình luận
-├── modules/              # Middleware & utilities
-│   ├── middlewares.js    # isAuth, isAdmin
-│   ├── upload.js         # Multer config (diskStorage, 10MB limit)
-│   └── firstimage.js    # Trích xuất ảnh đầu tiên từ HTML
-├── views/                # 28 files EJS (pages + partials)
-│   ├── navbar.ejs / navbar_public.ejs   # Navigation bars
-│   ├── footer.ejs / footer_public.ejs   # Footers
-│   ├── toast.ejs                        # Thông báo Toast
-│   └── ...                              # Admin CRUD + Public pages
-└── public/               # Tài nguyên tĩnh
-    ├── css/app.css       # Bootstrap 5.1.3 + CSS custom
-    ├── js/app.js         # JS chung (timeago, Bootstrap bundle)
-    ├── js/weather.js     # Widget thời tiết + đồng hồ
-    ├── js/config.js      # CKEditor config
-    └── images/uploads/   # Thư mục upload
+├── index.js              # Entry point (Setup Express, DB, Session, Middleware, Error Handler)
+├── .env                  # Biến môi trường (MONGO_URI) - [Bảo mật]
+├── models/               # Định nghĩa Schema (TaiKhoan, BaiViet, BinhLuan, ChuDe)
+├── routers/              # Xử lý Logic & Điều hướng (6 routers chuyên biệt)
+├── modules/              # Middlewares (Auth) & Utilities (Upload, Image Processor)
+├── public/               # Tài nguyên tĩnh
+│   ├── css/app.css       # Custom Styles & Bootstrap support
+│   ├── js/weather.js     # Widget Thời tiết & Đồng hồ vệ tinh (Fixed UI)
+│   └── images/uploads/   # Thư mục lưu trữ ảnh tải lên
+└── views/                # Giao diện EJS (Admin & Public - 28 files)
+    ├── partials/         # Navbar, Footer, Toast, JS scripts
+    └── ...               # Các trang quản trị và hiển thị nội dung
 ```
+
+---
 
 ## ✨ Tính năng nổi bật
 
-### 💎 Toàn vẹn dữ liệu & Tối ưu quản trị
+### 💎 Quản trị & Toàn vẹn dữ liệu
 
-- **Xóa liên hoàn (Cascade Delete):** Khi xóa bài viết, hệ thống tự động dọn dẹp bình luận và gỡ bookmark của tất cả người dùng liên quan.
-- **Chuyển nhượng tài khoản (Data Reassignment):** Khi xóa một tài khoản, toàn bộ bài viết và bình luận của họ được tự động chuyển về cho Admin, đảm bảo không bao giờ mất dữ liệu mồ côi.
-- **Cơ chế Safety Shield:** Toàn bộ Views được bảo vệ bởi logic kiểm tra dữ liệu null-safe, ngăn chặn hoàn toàn lỗi sập trang.
-- **Trạng thái Placeholder:** Hiển thị thông báo "Danh sách trống" trực quan cho tất cả bảng quản trị.
-- **Chống xóa chủ đề:** Không cho phép xóa chủ đề khi còn bài viết liên quan.
+- **Live Search Filter:** Chức năng lọc dữ liệu tức thì tại các bảng quản trị (Bài viết, Chủ đề, Tài khoản...) sử dụng jQuery (Client-side).
+- **Xóa liên hoàn (Cascade Delete):** Tự động dọn dẹp bình luận và bookmark khi xóa bài viết hoặc bình luận gốc.
+- **Chuyển nhượng dữ liệu:** Tự động chuyển quyền sở hữu bài viết về Admin khi xóa tài khoản để không làm mất nội dung.
+- **Logic Chủ đề v2:** Kiểm tra trùng tên chủ đề không phân biệt hoa thường (Case-insensitive unique).
+- **Auth Protection:** Middleware đa lớp bảo vệ quyền Admin và quyền sở hữu bài viết (Authorship).
 
-### 📝 Trải nghiệm người viết & Độc giả
+### 📝 Trải nghiệm người dùng (UX)
 
-- **Chính sách Bài viết (Author Policy):** Tác giả chỉ được sửa khi bài chưa duyệt. Admin có chế độ `mode=admin` để ghi đè.
-- **Bình luận đa cấp:** Hỗ trợ trả lời (Reply) 2 cấp, xóa bình luận gốc sẽ xóa toàn bộ phản hồi con.
-- **Bookmark:** Lưu/bỏ lưu bài viết với trang "Đã lưu" có phân trang.
-- **Bài viết liên quan:** Hiển thị tối đa 4 bài cùng chủ đề trong trang chi tiết.
-- **Phân trang toàn diện:** Trang chủ (12 bài/trang), Chuyên mục (12 bài/trang), Tìm kiếm (10 bài/trang), Đã lưu (12 bài/trang).
-- **Lượt xem thông minh:** Chống đếm lặp bằng session-based tracking.
-- **Media Optimization:** Upload ảnh tối đa **10MB**, tự động responsive 100% chiều rộng kèm đổ bóng.
-- **Tìm kiếm v2:** Tìm theo tiêu đề hoặc tóm tắt, có phân trang, chống ReDoS.
+- **Header Double-Fixed:** Hệ thống Header 2 tầng (Thời tiết/Thời gian phía trên, Menu phía dưới) luôn cố định khi cuộn trang.
+- **Giao diện Responsive:** Tối ưu hiển thị trên mọi thiết bị. Hình ảnh trong bài viết tự động thích ứng 100% chiều rộng.
+- **Bình luận đa cấp:** Hỗ trợ phản hồi (Reply) phân cấp rõ rệt.
+- **Bookmark & Xem nhiều:** Hệ thống lưu bài viết yêu thích và thống kê lượt xem thông minh (chống đếm lặp qua session).
+- **Weather & Time Widget:** Tích hợp dữ liệu thời tiết thực tế từ OpenWeatherMap và giờ vệ tinh chính xác.
 
-## 🔒 Bảo mật hệ thống
+---
 
-- Mã hóa mật khẩu bằng **bcrypt**.
-- Middleware bảo vệ đa tầng (`isAuth`, `isAdmin`).
-- Hệ thống chặn **IDOR** (kiểm tra quyền sở hữu ID).
-- Chống **ReDoS** (escape regex người dùng nhập).
-- Chặn xem bài chưa duyệt (chỉ Admin hoặc Tác giả).
-- Chặn tự đổi quyền/khóa tài khoản chính mình.
-- Toàn bộ hành động xóa/duyệt sử dụng **POST Method**.
+## 🔒 Bảo mật & Tối ưu
 
-## ⚙️ Hướng dẫn cài đặt
+- **An toàn Mật khẩu:** Mã hóa 1 chiều với bcrypt.
+- **Chống IDOR & ReDoS:** Kiểm tra quyền hạn nghiêm ngặt và xử lý regex an toàn trước khi tìm kiếm.
+- **Quản lý Session:** Lưu trữ session trong MongoDB (connect-mongo) giúp ổn định và bền bỉ.
+- **Error Handling:** Hệ thống bắt lỗi tập trung (Global Error Handler) đảm bảo website không bao giờ bị sập trắng trang.
 
-### Yêu cầu
+---
 
-- Node.js (v14+)
-- MongoDB Atlas (SaaS)
+## ⚙️ Hướng dẫn cài đặt & Vận hành
 
-### Các bước
+### 1. Yêu cầu hệ thống
 
-1.  **Clone dự án:** `git clone ...`
-2.  **Cài đặt:** `npm install`
-3.  **Cấu hình:** Tạo file `.env` chứa `MONGO_URI`.
-4.  **Khởi động:** `npm run dev` (phát triển) hoặc `npm start` (vận hành).
-5.  **Truy cập:** `http://localhost:3000`
+- **Node.js** v14.x trở lên.
+- **MongoDB** (Khuyến khích dùng MongoDB Atlas).
+
+### 2. Các bước thiết lập
+
+1. **Clone project:** `git clone <repo_url>`
+2. **Cài đặt thư viện:** `npm install`
+3. **Cấu hình môi trường:** Tạo file `.env` tại thư mục gốc với nội dung:
+   ```env
+   MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/trangtin
+   PORT=3000
+   ```
+4. **Chạy ứng dụng:**
+   - Chế độ phát triển: `npm run dev` (tự động restart khi sửa code).
+   - Chế độ vận hành: `npm start`.
+
+---
+
+## 🌐 Dịch vụ API & Cloud ứng dụng
+
+- **Rendering:** [Render.com](https://render.com) (Hosting & Deployment).
+- **Database:** [MongoDB Atlas](https://www.mongodb.com/atlas) (Cloud DB).
+- **Weather API:** [OpenWeatherMap](https://openweathermap.org/).
+- **Time API:** [WorldTimeAPI](http://worldtimeapi.org/).
+
+---
 
 ## 👨‍💻 Tác giả
 

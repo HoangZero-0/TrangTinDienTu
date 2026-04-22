@@ -9,7 +9,12 @@
 - **Ngôn ngữ chính:** JavaScript (Node.js v14+)
 - **Frameworks/Libraries:** Express.js 5.2.1, Mongoose 9.2.4 (MongoDB), EJS 5.0.1 (Template Engine), bcryptjs 3.0.3 (Auth), multer 2.1.1 (Upload), express-session 1.19.0, connect-mongo 6.0.0 (Session Store), dotenv 17.4.1 (Biến môi trường).
 - **Database:** MongoDB Atlas.
-- **Khác:** CKEditor 4.22.1 (soạn thảo bài viết), Bootstrap 5.1.3 (public pages via `app.css`) / 5.3.3 CDN (admin pages), Bootstrap Icons 1.8.1 (public) / 1.11.3 (admin), jQuery 3.7.1 (admin).
+- **Khác:** CKEditor 4.22.1 (soạn thảo bài viết), Bootstrap 5.1.3 (public pages via `app.css`) / 5.3.3 CDN (admin pages), Bootstrap Icons 1.8.1 (public) / 1.11.3 (admin), jQuery 3.7.1 (admin). **Tính năng mới:** Live Search Filter phía Client (jQuery).
+- **Dịch vụ Cloud & API bên thứ ba:**
+  - **Render.com:** Nền tảng hosting chính (Web Service + Cron job nếu có).
+  - **MongoDB Atlas:** Database as a Service (NoSQL).
+  - **OpenWeatherMap API:** Cung cấp dữ liệu thời tiết dựa trên vị trí người dùng.
+  - **WorldTimeAPI:** Đồng bộ thời gian thực từ vệ tinh.
 
 # 3. KIẾN TRÚC & CẤU TRÚC THƯ MỤC (ARCHITECTURE & STRUCTURE)
 
@@ -38,7 +43,7 @@
     footer.ejs             # Footer trang admin (bản quyền)
     footer_public.ejs      # Footer trang public (links + Toast include)
     toast.ejs              # Component thông báo Toast (success/error, auto-hide 4s)
-    javascript.ejs         # JS chung admin (jQuery, Bootstrap bundle, form validation)
+    javascript.ejs         # JS chung admin (jQuery Live Filter, Bootstrap bundle, form validation)
     index.ejs              # Trang chủ (phân trang 12 bài/trang, xem nhiều nhất)
     baiviet_chitiet.ejs    # Chi tiết bài viết (bình luận 2 cấp, bài viết liên quan, bookmark, responsive img)
     baiviet_chude.ejs      # Bài viết theo chuyên mục (phân trang động)
@@ -64,7 +69,7 @@
   /public               # Tài nguyên tĩnh
     /css/app.css           # Bootstrap 5.1.3 minified + CSS custom + Sticky Footer (Flexbox)
     /js/app.js             # JS chung public (timeago, Bootstrap bundle)
-    /js/weather.js         # Widget thời tiết + đồng hồ (dùng ở 7 trang public)
+    /js/weather.js         # Widget thời tiết + đồng hồ (được cố định ở top:0, z-index: 1040)
     /js/config.js          # CKEditor custom config
     /images/uploads/       # Thư mục upload ảnh người dùng
     /images/noimage.png    # Ảnh mặc định khi bài viết không có ảnh
@@ -92,7 +97,7 @@
 
 - **Các Model cốt lõi:**
   - `TaiKhoan`: HoVaTen, Email, HinhAnh, TenDangNhap (unique), MatKhau (bcrypt hashed), QuyenHan (user/admin), KichHoat (0/1), BaiVietDaLuu (array of refs). **Không cho tự đổi quyền/khóa chính mình.**
-  - `ChuDe`: TenChuDe (unique, required). **Chặn xóa nếu còn bài viết liên quan.** Kiểm tra trùng tên khi thêm/sửa.
+  - `ChuDe`: TenChuDe (unique, required). **Chặn xóa nếu còn bài viết liên quan.** Kiểm tra trùng tên (case-insensitive) khi thêm/sửa bằng Regex.
   - `BaiViet`: ChuDe (ref), TaiKhoan (ref), TieuDe, TomTat, NoiDung, NgayDang, LuotXem, KiemDuyet (0/1). **Xóa bài tự động dọn dẹp bình luận và bookmark.**
   - `BinhLuan`: BaiViet (ref), TaiKhoan (ref), NoiDung, NgayBinhLuan, KiemDuyet (0/1 — mặc định 1), BinhLuanCha (ref). **Xóa bình luận gốc tự động xóa toàn bộ phản hồi con.**
 
@@ -128,6 +133,7 @@
 - **Phân trang Tìm kiếm:** 10 kết quả/trang, tìm theo TieuDe hoặc TomTat (case-insensitive).
 - **Phân trang Đã lưu:** 12 bài/trang, sắp xếp bài mới lưu lên đầu.
 - **Sidebar:** Khung Giới thiệu, Thẻ chuyên mục, Top 3 xem nhiều nhất.
+- **UI Nâng cao:** Header cố định 2 lớp (Thời tiết trên, Menu dưới). Tìm kiếm Live Filter tại tất cả các bảng quản trị.
 
 # 7. DANH SÁCH ROUTE ĐẦY ĐỦ
 
@@ -189,7 +195,9 @@
 - [x] Chống đếm lượt xem lặp (session-based).
 - [x] Audit toàn bộ hệ thống lần 1 & lần 2: Fix route 404, phân trang chuyên mục, dead CSS, biến legacy, HTML/code thừa.
 - [x] Việt hóa 100% giao tiếp và hướng dẫn.
-- [x] Bàn giao hệ thống và đồng bộ tài liệu.
+- [x] Nâng cấp giao diện: Header cố định 2 lớp (Weather + Navbar) + Menu quản trị gọn gàng (container).
+- [x] Tính năng mới: Tìm kiếm Live Filter tại các trang quản trị và "Bài viết của tôi".
+- [x] Tối ưu nghiệp vụ: Kiểm tra trùng tên chủ đề không phân biệt hoa thường (case-insensitive).
 
 ## Đang tiến hành (In Progress)
 

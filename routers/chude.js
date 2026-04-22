@@ -24,8 +24,8 @@ router.get('/them', isAdmin, async (req, res) => {
 router.post('/them', isAdmin, async (req, res) => {
 	var tenChuDe = req.body.TenChuDe;
 	try {
-		// Kiểm tra trùng tên
-		var existing = await ChuDe.findOne({ TenChuDe: tenChuDe });
+		// Kiểm tra trùng tên (không phân biệt hoa thường)
+		var existing = await ChuDe.findOne({ TenChuDe: { $regex: new RegExp('^' + tenChuDe + '$', 'i') } });
 		if (existing) {
 			req.session.error = 'Tên chủ đề "' + tenChuDe + '" đã tồn tại.';
 			return req.session.save(() => res.redirect('/chude/them'));
@@ -55,8 +55,11 @@ router.post('/sua/:id', isAdmin, async (req, res) => {
 	var id = req.params.id;
 	var tenChuDe = req.body.TenChuDe;
 	try {
-		// Kiểm tra trùng tên với các chủ đề khác
-		var existing = await ChuDe.findOne({ TenChuDe: tenChuDe, _id: { $ne: id } });
+		// Kiểm tra trùng tên với các chủ đề khác (không phân biệt hoa thường)
+		var existing = await ChuDe.findOne({ 
+			TenChuDe: { $regex: new RegExp('^' + tenChuDe + '$', 'i') }, 
+			_id: { $ne: id } 
+		});
 		if (existing) {
 			req.session.error = 'Tên chủ đề "' + tenChuDe + '" đã tồn tại.';
 			return req.session.save(() => res.redirect('/chude/sua/' + id));

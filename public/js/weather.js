@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!header) return;
 
     const topbar = document.createElement('div');
-    topbar.className = 'border-bottom py-2';
+    topbar.className = 'topbar-weather border-bottom py-2 fixed-top';
     topbar.style.backgroundColor = '#f7f9fa';
     topbar.style.color = '#333';
     topbar.style.fontSize = '14px';
