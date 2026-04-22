@@ -23,9 +23,11 @@ router.get('/them', isAdmin, async (req, res) => {
 // POST: Thêm chủ đề
 router.post('/them', isAdmin, async (req, res) => {
 	var tenChuDe = req.body.TenChuDe;
+	const escapeRegex = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	const safeTen = escapeRegex(tenChuDe);
 	try {
-		// Kiểm tra trùng tên (không phân biệt hoa thường)
-		var existing = await ChuDe.findOne({ TenChuDe: { $regex: new RegExp('^' + tenChuDe + '$', 'i') } });
+		// Kiểm tra trùng tên (không phân biệt hoa thường) - Đã escape regex
+		var existing = await ChuDe.findOne({ TenChuDe: { $regex: new RegExp('^' + safeTen + '$', 'i') } });
 		if (existing) {
 			req.session.error = 'Tên chủ đề "' + tenChuDe + '" đã tồn tại.';
 			return req.session.save(() => res.redirect('/chude/them'));
@@ -54,10 +56,12 @@ router.get('/sua/:id', isAdmin, async (req, res) => {
 router.post('/sua/:id', isAdmin, async (req, res) => {
 	var id = req.params.id;
 	var tenChuDe = req.body.TenChuDe;
+	const escapeRegex = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	const safeTen = escapeRegex(tenChuDe);
 	try {
-		// Kiểm tra trùng tên với các chủ đề khác (không phân biệt hoa thường)
+		// Kiểm tra trùng tên với các chủ đề khác (không phân biệt hoa thường) - Đã escape regex
 		var existing = await ChuDe.findOne({ 
-			TenChuDe: { $regex: new RegExp('^' + tenChuDe + '$', 'i') }, 
+			TenChuDe: { $regex: new RegExp('^' + safeTen + '$', 'i') }, 
 			_id: { $ne: id } 
 		});
 		if (existing) {

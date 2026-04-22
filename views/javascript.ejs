@@ -2,27 +2,46 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <%- include('toast') %>
 <script>
-	(function() {
-		'use strict';
-		const forms = document.querySelectorAll('.needs-validation');
-		Array.from(forms).forEach(form => {
-			form.addEventListener('submit', event => {
-				if (!form.checkValidity()) {
-					event.preventDefault();
-					event.stopPropagation();
-				}
-				form.classList.add('was-validated');
-			}, false);
-		});
-	})();
+  (function () {
+    "use strict";
+    const forms = document.querySelectorAll(".needs-validation");
+    Array.from(forms).forEach((form) => {
+      form.addEventListener(
+        "submit",
+        (event) => {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          form.classList.add("was-validated");
+        },
+        false,
+      );
+    });
+  })();
 
-	$(document).ready(function() {
-		// Live Search Filter
-		$("#searchFilter").on("keyup", function() {
-			var value = $(this).val().toLowerCase();
-			$("table tbody tr").filter(function() {
-				$(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-			});
-		});
-	});
+  $(document).ready(function () {
+    // Hàm thực hiện tìm kiếm
+    function performSearch() {
+      var value = $("#searchFilter").val().toLowerCase();
+      $("table tbody tr").each(function () {
+        // Nếu là hàng có class 'text-center text-muted' (hàng thông báo trống) thì bỏ qua không lọc
+        if ($(this).find("td[colspan]").length > 0) return;
+
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+      });
+    }
+
+    // Kích hoạt khi bấm nút tìm
+    $("#btnSearch").on("click", function () {
+      performSearch();
+    });
+
+    // Kích hoạt khi nhấn Enter trong ô nhập liệu
+    $("#searchFilter").on("keypress", function (e) {
+      if (e.which == 13) {
+        performSearch();
+      }
+    });
+  });
 </script>
