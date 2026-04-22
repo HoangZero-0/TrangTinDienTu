@@ -40,7 +40,9 @@ router.post('/them', isAuth, async (req, res) => {
 		};
 		await BaiViet.create(data);
 		req.session.success = 'Đã đăng bài viết thành công và đang chờ kiểm duyệt.';
-		req.session.save(() => res.redirect('/baiviet/cuatoi'));
+		// Nếu là admin đăng bài, quay về trang quản lý chung, ngược lại quay về trang cá nhân
+		var redirectPath = (req.session.QuyenHan === 'admin') ? '/baiviet' : '/baiviet/cuatoi';
+		req.session.save(() => res.redirect(redirectPath));
 	} catch (err) {
 		req.session.error = 'Lỗi hệ thống: ' + err.message;
 		req.session.save(() => res.redirect('/baiviet/them'));
@@ -107,7 +109,9 @@ router.post('/sua/:id', isAuth, async (req, res) => {
 		};
 		await BaiViet.findByIdAndUpdate(id, data);
 		req.session.success = 'Đã cập nhật bài viết thành công.';
-		req.session.save(() => res.redirect('/baiviet/cuatoi'));
+		// Nếu đang ở chế độ admin, quay về trang quản lý chung, ngược lại quay về trang cá nhân
+		var redirectPath = isAdminMode ? '/baiviet' : '/baiviet/cuatoi';
+		req.session.save(() => res.redirect(redirectPath));
 	} catch (err) {
 		req.session.error = 'Lỗi hệ thống: ' + err.message;
 		req.session.save(() => res.redirect('/baiviet/sua/' + id + (isAdminMode ? '?mode=admin' : '')));
