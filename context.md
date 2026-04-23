@@ -1,6 +1,6 @@
 # 1. TỔNG QUAN DỰ ÁN (PROJECT META)
 
-- **Tên dự án:** TrangTin (iNews)
+- **Tên dự án:** TrangTin (VietNews)
 - **Mục tiêu cốt lõi:** Hệ thống CMS tin tức chuyên nghiệp, hỗ trợ đa người dùng, tương tác bình luận và quản trị nội dung an toàn.
 - **Nền tảng đích:** Web Application (Node.js/Express)
 - **Hosting:** Render.com

@@ -30,7 +30,7 @@ app.use("/", express.static(path.join(__dirname, "public")));
 var MongoStore = require("connect-mongo").MongoStore;
 app.use(
   session({
-    name: "iNews", // Tên session (tự chọn)
+    name: "VietNews", // Tên session (tự chọn)
     secret: "Mèo méo meo mèo meo", // Khóa bảo vệ (tự chọn)
     resave: false,
     saveUninitialized: false,

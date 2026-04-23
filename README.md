@@ -1,6 +1,6 @@
-# 📰 iNews — Trang Tin Điện Tử (Node.js & MongoDB)
+# 📰 VietNews — Trang Tin Điện Tử (Node.js & MongoDB)
 
-**iNews** là một hệ thống Quản trị Nội dung (CMS) tin tức hiện đại, được thiết kế tập trung vào tính bảo mật, hiệu năng và trải nghiệm người dùng tối ưu. Hệ thống cho phép người dùng đăng ký, đóng góp nội dung, tương tác qua bình luận và phân quyền quản trị chặt chẽ.
+**VietNews** là một hệ thống Quản trị Nội dung (CMS) tin tức hiện đại, được thiết kế tập trung vào tính bảo mật, hiệu năng và trải nghiệm người dùng tối ưu. Hệ thống cho phép người dùng đăng ký, đóng góp nội dung, tương tác qua bình luận và phân quyền quản trị chặt chẽ.
 
 ---
 

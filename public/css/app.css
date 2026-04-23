@@ -70,7 +70,7 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Chỉnh chiều cao cho thanh iNews */
+/* Chỉnh chiều cao cho thanh VietNews */
 .sticky-header-wrapper .navbar {
     padding: 0.35rem 0 !important; /* Giảm padding của thanh xuống một nửa */
 }
